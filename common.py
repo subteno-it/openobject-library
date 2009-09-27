@@ -23,35 +23,32 @@
 ##############################################################################
 
 """
-This script enable a connection on the OpenERP Server and return the list of
-module whom are installed.
+Common.py containt common information from all test files
 """
-from oobjlib.connection import Connection
-from oobjlib.component import Object
-from common import GetParser
 
-parser = GetParser('Module List', '0.1')
-opts, args = parser.parse_args()
+from optparse import OptionParser
 
-try:
-    cnx = Connection(
-        server=opts.server, 
-        dbname=opts.dbname, 
-        login=opts.user, 
-        password=opts.passwd, 
-        port=opts.port)
-except Exception, e:
-    print '%s' % str(e)
-    exit(1)
+def GetParser(appname, version):
+    """Creates and returns the commmand line parser"""
+    usage = "Usage: %prog [options]"
+    parser = OptionParser(usage, prog=appname,
+                          version=version)
+    parser.add_option('-s', '--server', dest='server',
+                      default='localhost',
+                      help='Indicate the server name or IP (default: localhost)')
+    parser.add_option('-p', '--port', dest='port',
+                      default=8069,
+                      help='Port (default: 8069)')
+    parser.add_option('-d', '--dbname', dest='dbname',
+                      default='demo',
+                      help='Name of the database (default: demo)')
+    parser.add_option('-u', '--user', dest='user',
+                      default='admin',
+                      help='Select an OpenERP User (default: admin)')
+    parser.add_option('-w', '--password', dest='passwd',
+                      default='admin',
+                      help='Enter the user password (default: admin)')
 
-modules = Object(cnx, "ir.module.module")
-print '--[Connection Object]---------------------'
-print '%s' % str(modules)
+    return parser
 
-ids = modules.search([('state', '=', 'installed')])
-print '--[Module list]---------------------------'
-for p in modules.read(ids, ['name']):
-    print '* %s' % p['name']
-
-print '--[End]-----------------------------------'
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

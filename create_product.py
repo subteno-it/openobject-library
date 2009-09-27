@@ -28,9 +28,18 @@ This test use the demo database
 """
 from oobjlib.connection import Connection
 from oobjlib.component import Object
+from common import GetParser
+
+parser = GetParser('Create Product', '0.1')
+opts, args = parser.parse_args()
 
 try:
-    cnx = Connection(server="localhost", dbname="demo", login="admin", password="admin", port=8069)
+    cnx = Connection(
+        server=opts.server, 
+        dbname=opts.dbname, 
+        login=opts.user, 
+        password=opts.passwd, 
+        port=opts.port)
 except Exception, e:
     print '%s' % str(e)
     exit(1)
@@ -43,6 +52,6 @@ args = {
     'categ_id': 1,
 }
 
-print '%r' % product.create(args)
+print 'Product ID %d created !' % product.create(args)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
