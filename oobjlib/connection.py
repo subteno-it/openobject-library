@@ -46,7 +46,6 @@ class Connection(object):
     def __str__(self):
         return '%s [%s]' % (self._url, self.dbname)
 
-
 class Database(object):
     """Instanciate Database Object"""
     def __init__(self, server="localhost", port=8069, supadminpass='admin'):
@@ -66,7 +65,6 @@ class Database(object):
 
     def __str__(self):
         """representation of this object"""
-        return '%s [%s]' % (self._url, self.dbname)
-
+        return '%s [%s]' % (self._url, self.superadminpass)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

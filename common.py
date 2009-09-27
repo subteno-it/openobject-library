@@ -48,6 +48,9 @@ def GetParser(appname, version):
     parser.add_option('-w', '--password', dest='passwd',
                       default='admin',
                       help='Enter the user password (default: admin)')
+    parser.add_option('-a', '--admin', dest='admin',
+                      default='admin',
+                      help='Default admin serveur, use for create/backup/restore database (default: admin)')
 
     return parser
 
