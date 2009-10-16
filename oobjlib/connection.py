@@ -28,8 +28,8 @@ from socket import error as socket_error
 class Connection(object):
     """Create a new database connection"""
     def __init__(self, server="localhost", port=8069, dbname="terp", login=None, password=None):
-        self.server, self.port = server, port
-        self._url = "http://%s:%d/xmlrpc/common" % (server, port)
+        self.server, self.port = server, int(port)
+        self._url = "http://%s:%d/xmlrpc/common" % (self.server, self.port)
         self._sock = xmlrpclib.ServerProxy(self._url)
         self.dbname = dbname
         self.login, self.password = login, password
@@ -37,7 +37,7 @@ class Connection(object):
         try:
             self.userid = self._sock.login(dbname, login, password)
         except socket_error, se:
-            raise Exception('Unable to connect to http://%s:%d: %s' % (server, port, se.args[1]))
+            raise Exception('Unable to connect to http://%s:%d: %s' % (self.server, self.port, se.args[1]))
         except xmlrpclib.Fault, err:
             raise Exception('%s: %s' % (err.faultCode.encode('utf-8'), err.faultString.encode('utf-8')))
         if not self.userid:
@@ -50,8 +50,8 @@ class Database(object):
     """Instanciate Database Object"""
     def __init__(self, server="localhost", port=8069, supadminpass='admin'):
         self.supadminpass = supadminpass
-        self.server, self.port = server, port
-        self._url = "http://%s:%d/xmlrpc/db" % (server, port)
+        self.server, self.port = server, int(port)
+        self._url = "http://%s:%d/xmlrpc/db" % (self.server, self.port)
         self._sock = xmlrpclib.ServerProxy(self._url)
 
     def __getattr__(self, name):
