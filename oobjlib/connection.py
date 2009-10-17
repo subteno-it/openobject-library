@@ -65,6 +65,6 @@ class Database(object):
 
     def __str__(self):
         """representation of this object"""
-        return '%s [%s]' % (self._url, self.superadminpass)
+        return '%s [%s]' % (self._url, self.supadminpass)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
