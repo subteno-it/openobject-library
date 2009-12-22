@@ -24,6 +24,9 @@
 Check rules for and object in the database, rules maybe global or per groups
 """
 
+import sys
+sys.path.append('../')
+
 from oobjlib.connection import Connection
 from oobjlib.component import Object
 from optparse import OptionParser, OptionGroup

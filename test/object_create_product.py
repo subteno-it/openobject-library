@@ -26,6 +26,10 @@
 This script enable a connection on the OpenERP Server and a product 
 This test use the demo database
 """
+
+import sys
+sys.path.append('../')
+
 from oobjlib.connection import Connection
 from oobjlib.component import Object
 from common import GetParser

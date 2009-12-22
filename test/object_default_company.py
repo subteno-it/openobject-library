@@ -25,6 +25,9 @@ Verify the customization for an objet in this company
 Only with OpenERP 5.2 and Greater
 """
 
+import sys
+sys.path.append('../')
+
 from oobjlib.connection import Connection
 from oobjlib.component import Object
 from optparse import OptionParser, OptionGroup

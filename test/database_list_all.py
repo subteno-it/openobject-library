@@ -25,6 +25,10 @@
 """
 Connect to the server and return the list of databases
 """
+
+import sys
+sys.path.append('../')
+
 from oobjlib.connection import Database
 
 from common import GetParser

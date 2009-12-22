@@ -24,6 +24,9 @@
 Extract XML for selected object or the globality
 """
 
+import sys
+sys.path.append('../')
+
 from oobjlib.connection import Connection
 from oobjlib.component import Object
 from optparse import OptionParser, OptionGroup

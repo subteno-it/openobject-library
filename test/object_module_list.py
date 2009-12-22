@@ -26,6 +26,10 @@
 This script enable a connection on the OpenERP Server and return the list of
 module whom are installed.
 """
+
+import sys
+sys.path.append('../')
+
 from oobjlib.connection import Connection
 from oobjlib.component import Object
 from common import GetParser
