@@ -83,8 +83,8 @@ user_id = user.search([('login','=', opts.user)])[0]
 company_id = user.read(user_id, ['company_id'])['company_id']
 dest = rule.domain_get(opts.model)
 
-print '     User: %s (id %d) => %s (id %d)' % (opts.user, user_id, company_id[1], company_id[0])
-print "     Rule: %s" % dest[0]
-print "Companies: %r" % dest[1]
+print 'User: %s (id %d) => %s (id %d)' % (opts.user, user_id, company_id[1], company_id[0])
+print "Rule: %s" % dest[0]
+print " IDS: %r" % dest[1]
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
