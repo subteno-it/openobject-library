@@ -32,7 +32,7 @@ sys.path.append('../')
 
 from oobjlib.connection import Connection
 from oobjlib.component import Object
-from common import GetParser
+from oobjlib.common import GetParser
 
 parser = GetParser('Module List', '0.1')
 opts, args = parser.parse_args()

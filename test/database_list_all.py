@@ -30,8 +30,7 @@ import sys
 sys.path.append('../')
 
 from oobjlib.connection import Database
-
-from common import GetParser
+from oobjlib.common import GetParser
 
 parser = GetParser('Database List', '0.1')
 opts, args = parser.parse_args()
