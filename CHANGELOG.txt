@@ -1,0 +1,31 @@
+Bugfixes
+--------
+
+ * Not linked to a bug report:
+   * Rules may not only apply on company_id field
+   * Add in sample file, the path to find oobjlib
+   * Incorrect variable to superadmin password
+   * Add Raise event on Object
+ * https://launchpad.net/bugs/453535
+   * #453535 issue with not default ftp port
+
+
+Improvements
+------------
+
+ * Missing manifest file
+ * Upgrade test file to use oobjlib.common instead if common
+ * common file in oobjlib
+ * Move sample to test directory
+ * Add XML extract for all record in the model
+ * Add rules checker for multi company
+ * Add tools to check default company in 5.2
+ * Add pylintrc file
+ * Add setup.py and release file
+ * Rename filenames to begin with the object used in oobjlib
+ * Add the super admin password from option parser
+ * Replace the __str__ representation
+ * Improve module_list and create_product to use common file
+ * Rename the script
+
+
