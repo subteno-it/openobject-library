@@ -25,7 +25,7 @@
 import xmlrpclib
 from socket import error as socket_error
 
-# TODO abastract the use of the context
+# TODO abstract the use of the context
 
 class Object(object):
     def __init__(self, connection, model):
@@ -41,7 +41,7 @@ class Object(object):
             except socket_error, se:
                 raise Exception('Unable to connect to http://%s:%d: %s' % (server, port, se.args[1]))
             except xmlrpclib.Fault, err:
-                raise Exception('%s: %s' % (err.faultCode.encode('utf-8'), err.faultString.encode('utf-8')))
+                raise Exception('%r: %s' % (err.faultCode, err.faultString.encode('utf-8')))
         return proxy
 
     def select(self, domain = None, fields=None):
@@ -60,8 +60,30 @@ class Wizard(object):
 
     def __getattr__(self, state):
         def proxy(**kwargs):
-            return self._sock.execute(self._connection.dbname, self._connection.userid, self._connection.password, self._id, kwargs, state)
+            return self._sock.execute(self._connection.dbname,
+                                      self._connection.userid,
+                                      self._connection.password,
+                                      self._id, kwargs, state)
         return proxy
+
+class Workflow(object):
+    """
+    Manage workflow
+    """
+    def __init__(self, connection, model):
+        self._connection = connection
+        self._model = model
+        u = "http://%s:%d/xmlrpc/object" % (connection.server, connection.port)
+        self._sock = xmlrpclib.ServerProxy(u)
+
+    def __getattr__(self, name):
+        def proxy(oid):
+            return self._sock.exec_workflow(self._connection.dbname,
+                                            self._connection.userid,
+                                            self._connection.password,
+                                            self._model, name, oid)
+        return proxy
+
 
 def demo():
     db = Database()
