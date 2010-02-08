@@ -55,8 +55,12 @@ class Wizard(object):
     def __init__(self, connection, name):
         self._connection = connection
         self._name = name
-        self._sock = xmlrpclib.ServerProxy("http://%s:%d/xmlrpc/wizard" % (connection.server, connection.port))
-        self._id = self._sock.create(self._connection.dbname, self._connection.userid, self._connection.password, self._name)
+        u = "http://%s:%d/xmlrpc/wizard" % (connection.server, connection.port)
+        self._sock = xmlrpclib.ServerProxy(u)
+        self._id = self._sock.create(self._connection.dbname, 
+                                     self._connection.userid, 
+                                     self._connection.password, 
+                                     self._name)
 
     def __getattr__(self, state):
         def proxy(**kwargs):
