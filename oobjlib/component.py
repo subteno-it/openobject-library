@@ -22,12 +22,19 @@
 #
 ##############################################################################
 
+"""
+This module is compose by component available in OpenObject
+"""
+
 import xmlrpclib
 from socket import error as socket_error
 
 # TODO abstract the use of the context
 
 class Object(object):
+    """
+    Create an Object relate to an OpenObject model
+    """
     def __init__(self, connection, model):
         self._connection = connection
         self._model = model
@@ -52,6 +59,9 @@ class Object(object):
         return '%s [%s]' % (self._url, self._model)
 
 class Wizard(object):
+    """
+    Manage a Wizard by pass a value and execute one of these actions
+    """
     def __init__(self, connection, name):
         self._connection = connection
         self._name = name
