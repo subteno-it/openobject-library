@@ -92,10 +92,13 @@ class Workflow(object):
 
     def __getattr__(self, name):
         def proxy(oid):
-            return self._sock.exec_workflow(self._connection.dbname,
+            try:
+                return self._sock.exec_workflow(self._connection.dbname,
                                             self._connection.userid,
                                             self._connection.password,
                                             self._model, name, oid)
+            except xmlrpclib.Fault, err:
+                raise Exception('%r: %s' % (err.faultCode, err.faultString.encode('utf-8')))
         return proxy
 
 
