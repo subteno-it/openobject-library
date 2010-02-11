@@ -97,6 +97,8 @@ class Workflow(object):
                                             self._connection.userid,
                                             self._connection.password,
                                             self._model, name, oid)
+            except socket_error, se:
+                raise Exception('Unable to connect to http://%s:%d: %s' % (server, port, se.args[1]))
             except xmlrpclib.Fault, err:
                 raise Exception('%r: %s' % (err.faultCode, err.faultString.encode('utf-8')))
         return proxy
