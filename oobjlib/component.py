@@ -67,17 +67,27 @@ class Wizard(object):
         self._name = name
         u = "http://%s:%d/xmlrpc/wizard" % (connection.server, connection.port)
         self._sock = xmlrpclib.ServerProxy(u)
-        self._id = self._sock.create(self._connection.dbname, 
-                                     self._connection.userid, 
-                                     self._connection.password, 
-                                     self._name)
+        try:
+            self._id = self._sock.create(self._connection.dbname,
+                                         self._connection.userid,
+                                         self._connection.password,
+                                         self._name)
+        except socket_error, se:
+            raise Exception('Unable to connect to http://%s:%d: %s' % (server, port, se.args[1]))
+        except xmlrpclib.Fault, err:
+            raise Exception('%r: %s' % (err.faultCode, err.faultString.encode('utf-8')))
 
     def __getattr__(self, state):
         def proxy(**kwargs):
-            return self._sock.execute(self._connection.dbname,
-                                      self._connection.userid,
-                                      self._connection.password,
-                                      self._id, kwargs, state)
+            try:
+                return self._sock.execute(self._connection.dbname,
+                                          self._connection.userid,
+                                          self._connection.password,
+                                          self._id, kwargs, state)
+            except socket_error, se:
+                raise Exception('Unable to connect to http://%s:%d: %s' % (server, port, se.args[1]))
+            except xmlrpclib.Fault, err:
+                raise Exception('%r: %s' % (err.faultCode, err.faultString.encode('utf-8')))
         return proxy
 
 class Workflow(object):
