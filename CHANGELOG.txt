@@ -2,6 +2,9 @@ Bugfixes
 --------
 
  * Not linked to a bug report:
+   * Signal on workflow_execute must be dynamic
+   * Convert XMLRPC exception to Exception in Workflow
+   * Raise message on Object have an invalid unicod problem
    * Rules may not only apply on company_id field
    * Add in sample file, the path to find oobjlib
    * Incorrect variable to superadmin password
@@ -13,6 +16,14 @@ Bugfixes
 Improvements
 ------------
 
+ * Add the same exception in Object to Wizard component
+ * Add exception socket_error on Workflow
+ * Add sample to call workflow
+ * Add docstring on component
+ * limit to 80 columns
+ * Add Workflow component
+ * pep 8 compliant
+ * Add new script to launch an interractive console to an openobject server
  * Missing manifest file
  * Upgrade test file to use oobjlib.common instead if common
  * common file in oobjlib
