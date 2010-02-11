@@ -38,7 +38,10 @@ common = OptionGroup(parser, "Application",
         "Application option")
 common.add_option('-m','--model', dest='model',
                  default='res.partner',
-                 help='select the model')
+                 help='select the model (eg: account.invoice)')
+common.add_option('', '--signal', dest='signal',
+                 default='',
+                 help='Enter the signal in the workflow to call (eg: invoice_open)')
 common.add_option('', '--id', dest='id',
                  default=0,
                  help='Enter the id of record')
@@ -59,10 +62,14 @@ except Exception, e:
 
 acc = Workflow(cnx, opts.model)
 
+if not opts.signal:
+    print 'Signal is required'
+    exit(1)
+
 try:
-    acc.invoice_open(int(opts.id))
+    getattr(acc, opts.signal)(int(opts.id))
 except Exception, err:
-    print '%r' % err
+    print '%s' % str(err)
 
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
