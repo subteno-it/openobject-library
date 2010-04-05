@@ -60,6 +60,23 @@ def Locale_Float(number, loc='en_US'):
         raise Exception, 'Unsuported locale (%s)' % loc
     return  locale.atof(number)
 
+def Locale_Date(datum, loc='en_US'):
+    """
+    Convert the locale number to a float
+
+    @type  number: str
+    @param number: Date representation in locale
+    @type  loc: str
+    @param loc: Customer locale
+    """
+    # Complete locale with encoding if necessary
+    if loc.find('.') == -1:
+        loc += '.utf-8'
+    try:
+         locale.setlocale(locale.LC_ALL, loc)
+    except locale.Error:
+        raise Exception, 'Unsuported locale (%s)' % loc
+    return Format_Date(datum, locale.nl_langinfo(locale.D_FMT))
 
 def test():
     try:
@@ -69,8 +86,10 @@ def test():
         assert Locale_Float('5,5', 'fr_FR') == 5.5
         # Convert number with thousand separator to a python float
         assert Locale_Float('1,987.90') == 1987.90
+        # Convert french date in openobject format
+        assert Locale_Date('19/02/2009', 'fr_FR') == '2009-02-19'
         print 'Test Done'
-    except AssetionError, e:
+    except AssertionError, e:
         print "Error: %r" % e
 
 if __name__ == '__main__':
