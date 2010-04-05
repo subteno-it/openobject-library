@@ -27,6 +27,7 @@ Global convertion function
 """
 
 import time
+import locale
 
 def Format_Date(datum, date_style):
     """
@@ -41,10 +42,33 @@ def Format_Date(datum, date_style):
     """
     return time.strftime('%Y-%m-%d', time.strptime(datum, date_style))
 
+def Locale_Float(number, loc='en_US'):
+    """
+    Convert the locale number to a float
+
+    @type  number: str
+    @param number: Number representation in locale
+    @type  loc: str
+    @param loc: Customer locale
+    """
+    # Complete locale with encoding if necessary
+    if loc.find('.') == -1:
+        loc += '.utf-8'
+    try:
+         locale.setlocale(locale.LC_ALL, loc)
+    except locale.Error:
+        raise Exception, 'Unsuported locale (%s)' % loc
+    return  locale.atof(number)
+
 
 def test():
     try:
+        # Convert french date to openobject format
         assert Format_Date('03/02/2010','%d/%m/%Y') == '2010-02-03'
+        # Convert french float to a python float
+        assert Locale_Float('5,5', 'fr_FR') == 5.5
+        # Convert number with thousand separator to a python float
+        assert Locale_Float('1,987.90') == 1987.90
         print 'Test Done'
     except AssetionError, e:
         print "Error: %r" % e
