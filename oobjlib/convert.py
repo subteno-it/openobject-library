@@ -40,7 +40,10 @@ def Format_Date(datum, date_style):
     @rtype: str
     @return: date convert for OpenObject
     """
-    return time.strftime('%Y-%m-%d', time.strptime(datum, date_style))
+    try:
+        return time.strftime('%Y-%m-%d', time.strptime(datum, date_style))
+    except ValueError:
+        return False
 
 def Locale_Float(number, loc='en_US'):
     """
