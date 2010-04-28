@@ -54,4 +54,14 @@ def GetParser(appname, version):
 
     return parser
 
+class UniqueList(list):
+    """Inhherit list to be unique"""
+    def append(self, o):
+        if o and o not in self:
+            super(unique_list, self).append(o)
+
+    def insert(self, p, o):
+        if o and o not in self:
+            super(unique_list, self).insert(p, o)
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
