@@ -43,7 +43,10 @@ group.add_option('-m', '--model', dest='model',
                  help='Enter the model name in OpenObject')
 parser.add_option_group(group)
 
-opts, args = parser.parse_args()
+try:
+    opts, args = parser.parse_args()
+except SystemExit:
+    sys.exit(0)
 
 try:
     cnx = Connection(
