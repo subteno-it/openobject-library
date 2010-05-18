@@ -31,6 +31,8 @@ sys.path.append('../')
 from oobjlib.connection import Connection
 from oobjlib.component import Object
 from optparse import OptionParser, OptionGroup
+from lxml.etree import Element, SubElement
+from lxml.etree import tostring
 
 
 usage = "Usage %prog [options]"
@@ -73,6 +75,10 @@ group.add_option('', '--header', dest='header',
                 action='store_true',
                 default=False,
                 help='Add XML and OpenObkect Header')
+group.add_option('', '--indent', dest='indent',
+                action='store_true',
+                default=False,
+                help='Indent the XML output')
 parser.add_option_group(group)
 
 opts, args = parser.parse_args()
@@ -96,12 +102,6 @@ except Exception, e:
     print "Error object %s doesn't exists" % opts.model
     exit(2)
 
-def FormatXML(text):
-    if not text:
-        return ''
-    text = text.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;')
-    text = text.encode('utf-8')
-    return text
 
 def Ir_Model_Data(model, id):
     """
@@ -118,49 +118,68 @@ def Ir_Model_Data(model, id):
         ret = '%s.%s' % (r['module'], r['name'])
     return ret
 
+###
+## Verify if there are records in the object
 ##
-# Verify if there are records in the object
-#
 count = model.search_count([])
 model_ids = model.search([], 0, count)
 
+root = Element('openerp')
+data = SubElement(root, 'data')
+header = ''
 if opts.header:
-    print '<?xml version="1.0" encoding="UTF-8"?>\n<openerp>\n<data>\n'
+    header = '<?xml version="1.0" encoding="UTF-8"?>\n'
 for m_id in model_ids:
     ##
     # Read the current id
     #
     mod = model.read(m_id)
-    print '<record model="%s" id="%s">' % (opts.model, Ir_Model_Data(opts.model, m_id))
+    record = SubElement(data, 'record')
+    record.set('model', opts.model)
+    record.set('id', Ir_Model_Data(opts.model, m_id))
     for fld in fields:
         f_type = fields[fld]['type']
         if mod[fld] or opts.all:
+            field = SubElement(record, 'field')
+            field.set('name', fld)
             if f_type in('char','text'):
-                print '    <field name="%s">%s</field>' % (fld, FormatXML(mod[fld]))
+                field.text = mod[fld] or ''
             elif f_type == 'int':
-                print '    <field name="%s" eval="%d"/>' % (fld, mod[fld] or 0)
+                field.set('eval', mod[fld] and str(mod[fld]) or '0')
+            elif f_type == 'float':
+                field.set('eval', mod[fld] and str(mod[fld]) or '0.0')
+            elif f_type == 'boolean':
+                field.set('eval', str(mod[fld]) or 'False')
+            elif f_type == 'date':
+                if mod[fld]:
+                    field.text = mod[fld]
+                else:
+                    field.set('eval', 'False')
             elif f_type == 'one2many':
                 pass
             elif f_type == 'many2one':
                 if mod[fld]:
-                    print '    <field name="%s" ref="%s"/>' % (fld, Ir_Model_Data(fields[fld]['relation'], mod[fld][0]))
+                    field.set('ref', Ir_Model_Data(fields[fld]['relation'], mod[fld][0]))
                 else:
-                    print '    <field name="%s" eval="False"/>' % (fld,)
-
+                    field.set('eval', 'False')
             elif f_type == 'many2many':
                 dd = ''
                 for d in mod[fld]:
                     dd += "ref('%s')," % Ir_Model_Data(fields[fld]['relation'], d)
                 if dd:
-                    print '    <field name="%s" eval="[(6,0,[%s])]"/>' % (fld, dd[:-1])
+                    field.set('eval', '[(6,0,[%s])]' % dd[:-1])
                 else:
-                    print '    <field name="%s" eval="[]"/>' % fld
+                    field.set('eval', '[]')
+            elif f_type == 'selection':
+                if not mod[fld]:
+                    field.set('eval', 'False')
+                if isinstance(mod[fld], (int, float, bool)):
+                    field.set('eval', str(mod[fld]))
+                else:
+                    field.text = str(mod[fld])
             else:
-                print '    <field name="%s">%s</field>' % (fld, mod[fld])
+                field.text = mod[fld] or ''
 
-    print '</record>'
-
-if opts.header:
-    print '\n</data>\n</openerp>'
+print tostring(root, encoding='UTF-8', xml_declaration=opts.header, pretty_print=opts.indent)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
