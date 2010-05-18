@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # --*- coding: utf-8 -*-
 ##############################################################################
 #
@@ -49,39 +50,49 @@ except Exception, e:
     print '%s' % str(e)
     exit(1)
 
-mod = Object(cnx, 'ir.model.data')
-model = mod.search([('model','=','ir.model')])
+mod = Object(cnx, 'ir.model')
+model = mod.search([])
 
 
 print 80 * '-'
 print '| Model                                         | Search |  Read  | View XML |'
 print 80 * '-'
 
+
+footer = '--- FOOTER REPORT ---\n'
+
 for m in mod.read(model):
-    if m['name'][6:].startswith('ir_'):
+    if m['model'].startswith('ir_'):
         continue
-    t = Object(cnx, m['name'][6:].replace('_','.'))
+    t = Object(cnx, m['model'])
     try:
         t_ids = t.search([])
         search = ('%d' % len(t_ids)).zfill(4)
-    except Exception:
+    except Exception, e:
         search = 'ERR '
+        footer += 'Objet: %s\n' % m['model']
+        footer += 'Message: %s\n' % str(e)
     try:
         read = 'NA '
         if t_ids:
             tr = t.read([t_ids[0]])
             read = 'OK '
-    except Exception:
-        read = 'ERR'
+    except Exception, e:
+        read = 'ERR'   #'ERR'
+        footer += 'Objet: %s\n' % m['model']
+        footer += 'Message: %s\n' % str(e)
 
     try:
         a = t.fields_view_get()
         view = 'OK '
-    except:
+    except Exception, e:
         view = 'ERR'
+        footer += 'Objet: %s\n' % m['model']
+        footer += 'Message: %s\n' % str(e)
 
+    print '| %s | %s   | %s    | %s   |' % (m['model'].ljust(45) ,search, read, view)
 
-    print '| %s | %s | %s | %s |' % (m['name'][6:].ljust(45) ,search, read, view)
-
+print 80 * '*'
+print footer
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
