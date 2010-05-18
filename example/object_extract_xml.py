@@ -126,9 +126,7 @@ model_ids = model.search([], 0, count)
 
 root = Element('openerp')
 data = SubElement(root, 'data')
-header = ''
-if opts.header:
-    header = '<?xml version="1.0" encoding="UTF-8"?>\n'
+
 for m_id in model_ids:
     ##
     # Read the current id
