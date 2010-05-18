@@ -142,7 +142,11 @@ for m_id in model_ids:
             elif f_type == 'one2many':
                 pass
             elif f_type == 'many2one':
-                print '    <field name="%s" ref="%s"/>' % (fld, Ir_Model_Data(fields[fld]['relation'], mod[fld][0]))
+                if mod[fld]:
+                    print '    <field name="%s" ref="%s"/>' % (fld, Ir_Model_Data(fields[fld]['relation'], mod[fld][0]))
+                else:
+                    print '    <field name="%s" eval="False"/>' % (fld,)
+
             elif f_type == 'many2many':
                 dd = ''
                 for d in mod[fld]:
