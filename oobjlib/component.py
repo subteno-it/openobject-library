@@ -39,7 +39,7 @@ class Object(object):
         self._connection = connection
         self._model = model
         self._url = "http://%s:%d/xmlrpc/object" % (connection.server, connection.port)
-        self._sock = xmlrpclib.ServerProxy(self._url)
+        self._sock = xmlrpclib.ServerProxy(self._url, allow_none=True)
 
     def __getattr__(self, name):
         def proxy(*args, **kwargs):
