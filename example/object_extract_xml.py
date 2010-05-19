@@ -142,7 +142,7 @@ for m_id in model_ids:
             field.set('name', fld)
             if f_type in('char','text'):
                 field.text = mod[fld] or ''
-            elif f_type == 'int':
+            elif f_type in ('int','integer'):
                 field.set('eval', mod[fld] and str(mod[fld]) or '0')
             elif f_type == 'float':
                 field.set('eval', mod[fld] and str(mod[fld]) or '0.0')
@@ -176,7 +176,7 @@ for m_id in model_ids:
                 else:
                     field.text = str(mod[fld])
             else:
-                field.text = mod[fld] or ''
+                field.text = str(mod[fld]) or ''
 
 print tostring(root, encoding='UTF-8', xml_declaration=opts.header, pretty_print=opts.indent)
 
