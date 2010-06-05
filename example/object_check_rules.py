@@ -62,9 +62,10 @@ group = OptionGroup(parser, 'Multi company default',
 group.add_option('-m', '--model', dest='model',
                 default='res.partner',
                 help='Enter the model name to check'),
-#group.add_option('-c', '--company', dest='company',
-#                default='',
-#                help='Enter list of companies, seprate by a comma (,)')
+group.add_option('-l', '--legend', dest='legend',
+                action="store_true",
+                default=False,
+                help='List the company by name and their ID')
 parser.add_option_group(group)
 
 opts, args = parser.parse_args()
@@ -81,6 +82,15 @@ rule = Object(cnx, 'ir.rule')
 
 user_id = user.search([('login','=', opts.user)])[0]
 
+if opts.legend:
+    comp = Object(cnx, 'res.company')
+    company_ids = comp.search([])
+    print 'List all company'
+    print 80 * '*'
+    for compa in comp.read(company_ids, ['name']):
+        print '%s -> %d' % (compa['name'].ljust(20), compa['id'])
+    print 80 * '*'
+
 company_id = user.read(user_id, ['company_id'])['company_id']
 try:
     dest = rule.domain_get(opts.model)
@@ -88,8 +98,12 @@ except Exception, e:
     print "Object %s doesn't exists" % opts.model
     exit(1)
 
-print 'User: %s (id %d) => %s (id %d)' % (opts.user, user_id, company_id[1], company_id[0])
-print "Rule: %s" % dest[0]
-print " IDS: %r" % dest[1]
+print '\nUser: %s (id %d) => %s (id %d)' % (opts.user, user_id, company_id[1], company_id[0])
+
+if dest[0] or dest[1]:
+    where = ' AND '.join(dest[0])
+    where = where % tuple(dest[1])
+    print 'Rules: %s' % where
+
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
