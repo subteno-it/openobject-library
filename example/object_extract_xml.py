@@ -137,6 +137,8 @@ for m_id in model_ids:
     record.set('id', Ir_Model_Data(opts.model, m_id))
     for fld in fields:
         f_type = fields[fld]['type']
+        if fld in ('parent_left','parent_right'):
+            continue
         if mod[fld] or opts.all:
             field = SubElement(record, 'field')
             field.set('name', fld)
