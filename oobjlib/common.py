@@ -27,29 +27,33 @@ Common.py containt common information from all test files
 """
 
 from optparse import OptionParser
+import os
 
 def GetParser(appname, version):
     """Creates and returns the commmand line parser"""
-    usage = "Usage: %prog [options]"
+    usage = """Usage: %prog [options]
+    We can use environnement variable:
+    OERP_SERVER, OERP_PORT, OERP_DATABASE, OERP_USERNAME, OERP_PASSWORD
+    """
     parser = OptionParser(usage, prog=appname,
                           version=version)
     parser.add_option('-s', '--server', dest='server',
-                      default='localhost',
+                      default=os.environ.get('OERP_SERVER','localhost'),
                       help='Indicate the server name or IP (default: localhost)')
     parser.add_option('-p', '--port', dest='port',
-                      default=8069,
+                      default=os.environ.get('OERP_PORT',8069),
                       help='Port (default: 8069)')
     parser.add_option('-d', '--dbname', dest='dbname',
-                      default='demo',
+                      default=os.environ.get('OERP_DATABASE','demo'),
                       help='Name of the database (default: demo)')
     parser.add_option('-u', '--user', dest='user',
-                      default='admin',
+                      default=os.environ.get('OERP_USERNAME','admin'),
                       help='Select an OpenERP User (default: admin)')
     parser.add_option('-w', '--password', dest='passwd',
-                      default='admin',
+                      default=os.environ.get('OERP_PASSWORD','admin'),
                       help='Enter the user password (default: admin)')
     parser.add_option('-a', '--admin', dest='admin',
-                      default='admin',
+                      default=os.environ.get('OERP_SUPER_PASSWORD','admin'),
                       help='Default admin serveur, use for create/backup/restore database (default: admin)')
 
     return parser
