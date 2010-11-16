@@ -31,7 +31,7 @@ sys.path.append('../')
 
 from oobjlib.connection import Connection
 from oobjlib.component import Object
-from common import GetParser
+from oobjlib.common import GetParser
 from optparse import OptionGroup
 
 parser = GetParser('Interractive mode', '0.1')
