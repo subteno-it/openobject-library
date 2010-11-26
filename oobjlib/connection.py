@@ -40,11 +40,16 @@ class Connection(object):
             raise Exception('Unable to connect to http://%s:%d: %s' % (self.server, self.port, se.args[1]))
         except xmlrpclib.Fault, err:
             raise Exception('%s: %s' % (err.faultCode.encode('utf-8'), err.faultString.encode('utf-8')))
+
         if not self.userid:
             raise Exception("Unable to connect to database %s using %s" % (dbname, login,))
 
     def __str__(self):
         return '%s [%s]' % (self._url, self.dbname)
+
+    def __repr__(self):
+        return self.__str__()
+
 
 class Database(object):
     """Instanciate Database Object"""
@@ -66,5 +71,8 @@ class Database(object):
     def __str__(self):
         """representation of this object"""
         return '%s [%s]' % (self._url, self.supadminpass)
+
+    def __repr__(self):
+        return self.__str__()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
