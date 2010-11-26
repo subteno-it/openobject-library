@@ -58,7 +58,7 @@ def Locale_Float(number, loc='en_US'):
     if loc.find('.') == -1:
         loc += '.utf-8'
     try:
-         locale.setlocale(locale.LC_ALL, loc)
+        locale.setlocale(locale.LC_ALL, loc)
     except locale.Error:
         raise Exception, 'Unsuported locale (%s)' % loc
     return  locale.atof(number)
