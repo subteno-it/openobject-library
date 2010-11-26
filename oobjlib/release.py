@@ -2,7 +2,7 @@
 ##############################################################################
 #
 #    OpenObject Library
-#    Copyright (C) 2009 Syleam (<http://syleam.fr>). Christophe Chauvet 
+#    Copyright (C) 2009i-2010 Syleam (<http://syleam.fr>). Christophe Chauvet 
 #                  All Rights Reserved
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -25,7 +25,7 @@
 name = "OpenObject-Library"
 appname = name.lower()
 version = "1.0.0"
-copyright = "Copyright (C) 2009 Christophe CHAUVET <christophe.chauvet@syleam.fr>"
+copyright = "Copyright (C) 2009-2010 Christophe CHAUVET <christophe.chauvet@syleam.fr>"
 description = "Web Services library OpenObject Framework"
 author = "Christophe CHAUVET"
 author_email = "christophe.chauvet@syleam.fr"
