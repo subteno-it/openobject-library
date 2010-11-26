@@ -2,7 +2,7 @@
 ##############################################################################
 #
 #    OpenObject Library
-#    Copyright (C) 2009 Syleam (<http://syleam.fr>). Christophe Chauvet 
+#    Copyright (C) 2009 Syleam (<http://syleam.fr>). Christophe Chauvet
 #                  All Rights Reserved
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -25,6 +25,7 @@ from oobjlib import release
 
 import os
 
+
 def find_packages(base):
     """Find all package for this application
 
@@ -40,11 +41,17 @@ def find_packages(base):
             ret += find_packages(full_path)
     return ret
 
+if os.path.exists("README.rst"):
+    import codecs
+    long_description = codecs.open('README.rst', "r", "utf-8").read()
+else:
+    long_description = release.long_description
+
 setup(
     name=release.appname,
     version=release.version,
     description=release.description,
-    long_description=release.long_description,
+    long_description=long_description,
     author=release.author,
     author_email=release.author_email,
     license='GPLv3',
