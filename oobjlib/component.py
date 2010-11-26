@@ -2,9 +2,9 @@
 ##############################################################################
 #
 #    OpenObject Library
-#    Copyright (C) 2009 Tiny (<http://tiny.be>). Christophe Simonis 
+#    Copyright (C) 2009 Tiny (<http://tiny.be>). Christophe Simonis
 #                  All Rights Reserved
-#    Copyright (C) 2009 Syleam (<http://syleam.fr>). Christophe Chauvet 
+#    Copyright (C) 2009 Syleam (<http://syleam.fr>). Christophe Chauvet
 #                  All Rights Reserved
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -29,7 +29,6 @@ This module is compose by component available in OpenObject
 import xmlrpclib
 from socket import error as socket_error
 
-# TODO abstract the use of the context
 
 class Object(object):
     """
@@ -46,17 +45,18 @@ class Object(object):
             try:
                 return self._sock.execute(self._connection.dbname, self._connection.userid, self._connection.password, self._model, name, *args, **kwargs)
             except socket_error, se:
-                raise Exception('Unable to connect to http://%s:%d: %s' % (server, port, se.args[1]))
+                raise Exception('Unable to connect to http://%s:%d: %s' % (self._connection.server, self._connection.port, se.args[1]))
             except xmlrpclib.Fault, err:
                 raise Exception('%r: %s' % (err.faultCode, err.faultString.encode('utf-8')))
         return proxy
 
-    def select(self, domain = None, fields=None):
+    def select(self, domain=None, fields=None):
         ids = self.search(domain or [])
         return self.read(ids, fields or [])
 
     def __str__(self,):
         return '%s [%s]' % (self._url, self._model)
+
 
 class Wizard(object):
     """
@@ -73,7 +73,7 @@ class Wizard(object):
                                          self._connection.password,
                                          self._name)
         except socket_error, se:
-            raise Exception('Unable to connect to http://%s:%d: %s' % (server, port, se.args[1]))
+            raise Exception('Unable to connect to http://%s:%d: %s' % (self._connection.server, self._connection.port, se.args[1]))
         except xmlrpclib.Fault, err:
             raise Exception('%r: %s' % (err.faultCode, err.faultString.encode('utf-8')))
 
@@ -85,10 +85,11 @@ class Wizard(object):
                                           self._connection.password,
                                           self._id, kwargs, state)
             except socket_error, se:
-                raise Exception('Unable to connect to http://%s:%d: %s' % (server, port, se.args[1]))
+                raise Exception('Unable to connect to http://%s:%d: %s' % (self._connection.server, self._connection.port, se.args[1]))
             except xmlrpclib.Fault, err:
                 raise Exception('%r: %s' % (err.faultCode, err.faultString.encode('utf-8')))
         return proxy
+
 
 class Workflow(object):
     """
@@ -108,13 +109,14 @@ class Workflow(object):
                                             self._connection.password,
                                             self._model, name, oid)
             except socket_error, se:
-                raise Exception('Unable to connect to http://%s:%d: %s' % (server, port, se.args[1]))
+                raise Exception('Unable to connect to http://%s:%d: %s' % (self._connection.server, self._connection.port, se.args[1]))
             except xmlrpclib.Fault, err:
                 raise Exception('%r: %s' % (err.faultCode, err.faultString.encode('utf-8')))
         return proxy
 
 
 def demo():
+    from connection import Connection, Database
     db = Database()
     print repr(db.list())
 
