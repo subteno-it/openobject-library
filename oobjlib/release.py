@@ -24,7 +24,7 @@
 
 name = "OpenObject-Library"
 appname = name.lower()
-version = "1.0dev"
+version = "1.0.0"
 copyright = "Copyright (C) 2009 Christophe CHAUVET <christophe.chauvet@syleam.fr>"
 description = "Web Services library OpenObject Framework"
 author = "Christophe CHAUVET"
@@ -32,6 +32,17 @@ author_email = "christophe.chauvet@syleam.fr"
 url = "https://launchpad.net/openobject-library"
 long_description = """OpenObject-Library is a library to manage 
 OpenObject Server
+"""
+classifiers="""
+Development Status :: 4 - Beta
+Environment :: Console
+License :: OSI Approved :: GNU Affero General Public License v3
+Operating System :: OS Independent
+Programming Language :: Python :: 2.4
+Programming Language :: Python :: 2.5
+Programming Language :: Python :: 2.6
+Programming Language :: Python :: 2.7
+Topic :: Software Development :: Libraries :: Python Modules
 """
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

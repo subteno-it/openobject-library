@@ -56,6 +56,7 @@ setup(
     author_email=release.author_email,
     license='GPLv3',
     url=release.url,
-    packages=find_packages('oobjlib'))
+    packages=find_packages('oobjlib'),
+    classifiers=filter(None, release.classifiers.split("\n")),)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
