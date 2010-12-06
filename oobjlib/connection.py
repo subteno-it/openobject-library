@@ -28,6 +28,7 @@ from socket import error as socket_error
 
 class Connection(object):
     """Create a new database connection"""
+    __slots__ = ('server', 'port', '_url', '_sock', 'dbname', 'login', 'password', 'userid')
     def __init__(self, server="localhost", port=8069, dbname="terp", login=None, password=None):
         self.server, self.port = server, int(port)
         self._url = "http://%s:%d/xmlrpc/common" % (self.server, self.port)
@@ -69,6 +70,7 @@ class Connection(object):
 
 class Database(object):
     """Instanciate Database Object"""
+    __slots__ = ('supadminpass', 'server', 'port', '_url', '_sock')
     def __init__(self, server="localhost", port=8069, supadminpass='admin'):
         self.supadminpass = supadminpass
         self.server, self.port = server, int(port)
