@@ -4,7 +4,7 @@
 
 :Version: 1.0.0
 
-`oobjlib` is a library to interract with the OpenERP Framework, known as `OpenObject`_
+`openobject-library` is a library to interract with the OpenERP Framework, known as `OpenObject`_
 
 
 .. _`OpenObject`: https://launchpad.net/openobject
