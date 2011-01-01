@@ -50,12 +50,19 @@ group.add_option('-v', '--verbose', dest='verbose',
                  action='store_true',
                  default=False,
                  help='Add verbose mode')
+group.add_option('-l', '--log-file', dest='logfile',
+                 default=False,
+                 help='Enter the name of the log file')
 parser.add_option_group(group)
 
 opts, args = parser.parse_args()
 
+if opts.logfile:
+    ch = logging.FileHandler(opts.logfile)
+else:
+    ch = logging.StreamHandler()
+
 logger = logging.getLogger("importcsv")
-ch = logging.StreamHandler()
 if opts.verbose:
     logger.setLevel(logging.DEBUG)
     ch.setLevel(logging.DEBUG)
@@ -96,6 +103,7 @@ def execute_import(filename, connection, separator=','):
 
     obj = Object(connection, model)
 
+    logger.info('Read and analyse the file content')
     fp = open(filename, 'r')
     header = False
     lines = []
@@ -113,9 +121,15 @@ def execute_import(filename, connection, separator=','):
         else:
             lines.append(content)
             logger.debug('line %d: %s' % (count, str(content)))
+    logger.info('Read the file content is finished')
 
+    logger.info('Start import the content in OpenERP (%d datas)' % len(lines))
+    count = 0
     for l in lines:
+        count += 1
+        logger.debug('Import line %d :' % count)
         obj.import_data(header, [l])
+    logger.info('Import finished')
 
 if opts.filename:
     # Check if the file exists
