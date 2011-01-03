@@ -139,10 +139,15 @@ def execute_import(filename, connection, separator=',', transaction=False, error
 
     logger.info('Start import the content in OpenERP (%d datas)' % len(lines))
     count = 0
+    ctx = {'defer_parent_store_computation': True}
     if transaction:
         try:
             logger.info('Import %s lines in one transaction' % len(lines))
-            obj.import_data(header, lines, 'init', '', {'defer_parent_store_computation': True})
+            res = obj.import_data(header, lines, 'init', '', False, ctx)
+            if res[0] == -1:
+                logger.error('%s' % res[2])
+                logger.debug('%s' % str(res[1]))
+            logger.info('End transaction import')
         except Exception, e:
             logger.error(str(e))
             if error_stop:
@@ -152,7 +157,10 @@ def execute_import(filename, connection, separator=',', transaction=False, error
             count += 1
             logger.debug('Import line %d :' % count)
             try:
-                obj.import_data(header, [l], 'init', '', {'defer_parent_store_computation': True})
+                res = obj.import_data(header, [l], 'init', '', False, ctx)
+                if res[0] == -1:
+                    logger.error('%s' % res[2])
+                    logger.debug('%s' % str(res[1]))
             except Exception, e:
                 logger.error(str(e))
                 if error_stop:
@@ -171,7 +179,7 @@ if opts.filename:
     if not fn.endswith('.csv'):
         logger.error('File must have a CSV extension')
         sys.exit(4)
-    logger.info('Start execute import')
+    logger.info('Start execute import on the selected file')
     execute_import(opts.filename, cnx, opts.separator, opts.transaction)
 
 elif opts.directory:
