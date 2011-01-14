@@ -89,6 +89,12 @@ if opts.filename and opts.directory:
     logger.error('You cannot use --filename and --directory at the same time')
     sys.exit(1)
 
+if opts.filename:
+    opts.filename = os.path.expanduser(opts.filename)
+
+if opts.directory:
+    opts.directory = os.path.expanduser(opts.directory)
+
 try:
     logger.info('Open connection to "%s:%s" on "%s" with user "%s" ' % (opts.server, opts.port, opts.dbname, opts.user))
     cnx = Connection(
@@ -185,6 +191,7 @@ if opts.filename:
 elif opts.directory:
     import glob
     list_file = glob.glob(os.path.join(opts.directory, '*.csv'))
+    list_file.sort()
     for i in list_file:
         logger.info('Start execute import for %s' % i.split('/').pop())
         try:
