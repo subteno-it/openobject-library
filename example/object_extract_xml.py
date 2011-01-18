@@ -3,7 +3,7 @@
 ##############################################################################
 #
 #    OpenObject Library
-#    Copyright (C) 2009 Syleam (<http://syleam.fr>). Christophe Chauvet 
+#    Copyright (C) 2009 Syleam (<http://syleam.fr>). Christophe Chauvet
 #                  All Rights Reserved
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -83,6 +83,9 @@ group.add_option('', '--with-inactive', dest='inactive',
                  action='store_true',
                  default=False,
                  help='Extract inactive records')
+group.add_option('', '--id', dest='id', type=int,
+                 default=False,
+                 help='Indicate which ID you want to extract')
 parser.add_option_group(group)
 
 opts, args = parser.parse_args()
@@ -116,20 +119,26 @@ def Ir_Model_Data(model, id):
     Search if the record was previously register in ir_model_data
     """
     args = [
-        ('model','=', model),
+        ('model', '=', model),
         ('res_id', '=', id)
     ]
-    ret = '%s_%d' % (model.replace('.','_'), id)
+    ret = '%s_%d' % (model.replace('.', '_'), id)
     res = model_data.search(args)
     if res:
-        r = model_data.read(res, ['module','name'])[0]
+        r = model_data.read(res, ['module', 'name'])[0]
         ret = '%s.%s' % (r['module'], r['name'])
     return ret
 
 ###
 ## Verify if there are records in the object
 ##
-if opts.inactive:
+if opts.id:
+    if not model.search([('id', '=', opts.id)], 0, 1, 0, {'active_test': False}):
+        print 'ID %d does not exists in the database' % opts.id
+        sys.exit(1)
+
+    model_ids = [opts.id]
+elif opts.inactive:
     count = model.search_count([], {'active_test': False})
     model_ids = model.search([], 0, count, 0, {'active_test': False})
 else:
@@ -150,14 +159,14 @@ for m_id in model_ids:
     record.set('id', Ir_Model_Data(opts.model, m_id))
     for fld in f_list:
         f_type = fields[fld]['type']
-        if fld in ('parent_left','parent_right'):
+        if fld in ('parent_left', 'parent_right'):
             continue
         if mod[fld] or opts.all or fld == 'active':
             field = SubElement(record, 'field')
             field.set('name', fld)
-            if f_type in('char','text'):
+            if f_type in('char', 'text'):
                 field.text = mod[fld] or ''
-            elif f_type in ('int','integer'):
+            elif f_type in ('int', 'integer'):
                 field.set('eval', mod[fld] and str(mod[fld]) or '0')
             elif f_type == 'float':
                 field.set('eval', mod[fld] and str(mod[fld]) or '0.0')
