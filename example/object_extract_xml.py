@@ -102,6 +102,10 @@ model_data = Object(cnx, 'ir.model.data')
 #
 try:
     fields = model.fields_get()
+    f_list = []
+    for i in fields:
+        f_list.append(i)
+    f_list.sort()
 except Exception, e:
     print "Error object %s doesn't exists" % opts.model
     exit(2)
@@ -144,7 +148,7 @@ for m_id in model_ids:
     record = SubElement(data, 'record')
     record.set('model', opts.model)
     record.set('id', Ir_Model_Data(opts.model, m_id))
-    for fld in fields:
+    for fld in f_list:
         f_type = fields[fld]['type']
         if fld in ('parent_left','parent_right'):
             continue
