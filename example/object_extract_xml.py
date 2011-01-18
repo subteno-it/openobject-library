@@ -86,6 +86,10 @@ group.add_option('', '--with-inactive', dest='inactive',
 group.add_option('', '--id', dest='id', type=int,
                  default=False,
                  help='Indicate which ID you want to extract')
+group.add_option('', '--follow-one2many', dest='one2many',
+                 action='store_true',
+                 default=False,
+                 help='Follow the one2many child of this record')
 parser.add_option_group(group)
 
 opts, args = parser.parse_args()
@@ -157,6 +161,7 @@ for m_id in model_ids:
     record = SubElement(data, 'record')
     record.set('model', opts.model)
     record.set('id', Ir_Model_Data(opts.model, m_id))
+    o2m_dict = {}
     for fld in f_list:
         f_type = fields[fld]['type']
         if fld in ('parent_left', 'parent_right'):
@@ -178,7 +183,9 @@ for m_id in model_ids:
                 else:
                     field.set('eval', 'False')
             elif f_type == 'one2many':
-                pass
+                if opts.one2many:
+                    o2m_dict[fld] = (fields[fld]['relation'], mod[fld])
+
             elif f_type == 'many2one':
                 if mod[fld]:
                     field.set('ref', Ir_Model_Data(fields[fld]['relation'], mod[fld][0]))
@@ -201,6 +208,66 @@ for m_id in model_ids:
                     field.text = str(mod[fld])
             else:
                 field.text = str(mod[fld]) or ''
+
+    # For each O2M relation we retrive all datas
+    for rel_field in o2m_dict:
+        o2m_m, o2m_ids = o2m_dict[rel_field]
+        o2m_model = Object(cnx, o2m_m)
+        o2m_fields = o2m_model.fields_get()
+        o2mf_list = []
+        for i in o2m_fields:
+            o2mf_list.append(i)
+        o2mf_list.sort()
+
+        for l in o2m_ids:
+            mod = o2m_model.read(l)
+            record = SubElement(data, 'record')
+            record.set('model', o2m_m)
+            record.set('id', Ir_Model_Data(o2m_m, l))
+            for fld in o2mf_list:
+                f_type = o2m_fields[fld]['type']
+                if fld in ('parent_left', 'parent_right'):
+                    continue
+                if mod[fld] or opts.all:
+                    field = SubElement(record, 'field')
+                    field.set('name', fld)
+                    if f_type in('char', 'text'):
+                        field.text = mod[fld] or ''
+                    elif f_type in ('int', 'integer'):
+                        field.set('eval', mod[fld] and str(mod[fld]) or '0')
+                    elif f_type == 'float':
+                        field.set('eval', mod[fld] and str(mod[fld]) or '0.0')
+                    elif f_type == 'boolean':
+                        field.set('eval', str(mod[fld]) or 'False')
+                    elif f_type == 'date':
+                        if mod[fld]:
+                            field.text = mod[fld]
+                        else:
+                            field.set('eval', 'False')
+                    elif f_type == 'one2many':
+                        pass
+                    elif f_type == 'many2one':
+                        if mod[fld]:
+                            field.set('ref', Ir_Model_Data(o2m_fields[fld]['relation'], mod[fld][0]))
+                        else:
+                            field.set('eval', 'False')
+                    elif f_type == 'many2many':
+                        dd = ''
+                        for d in mod[fld]:
+                            dd += "ref('%s')," % Ir_Model_Data(o2m_fields[fld]['relation'], d)
+                        if dd:
+                            field.set('eval', '[(6,0,[%s])]' % dd[:-1])
+                        else:
+                            field.set('eval', '[]')
+                    elif f_type == 'selection':
+                        if not mod[fld]:
+                            field.set('eval', 'False')
+                        if isinstance(mod[fld], (int, float, bool)):
+                            field.set('eval', str(mod[fld]))
+                        else:
+                            field.text = str(mod[fld])
+                    else:
+                        field.text = str(mod[fld]) or ''
 
 print tostring(root, encoding='UTF-8', xml_declaration=opts.header, pretty_print=opts.indent)
 
