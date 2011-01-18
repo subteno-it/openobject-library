@@ -79,6 +79,10 @@ group.add_option('', '--indent', dest='indent',
                 action='store_true',
                 default=False,
                 help='Indent the XML output')
+group.add_option('', '--with-inactive', dest='inactive',
+                 action='store_true',
+                 default=False,
+                 help='Extract inactive records')
 parser.add_option_group(group)
 
 opts, args = parser.parse_args()
@@ -121,8 +125,13 @@ def Ir_Model_Data(model, id):
 ###
 ## Verify if there are records in the object
 ##
-count = model.search_count([])
-model_ids = model.search([], 0, count)
+if opts.inactive:
+    count = model.search_count([], {'active_test': False})
+    model_ids = model.search([], 0, count, 0, {'active_test': False})
+else:
+    count = model.search_count([])
+    model_ids = model.search([], 0, count)
+
 
 root = Element('openerp')
 data = SubElement(root, 'data')
@@ -139,7 +148,7 @@ for m_id in model_ids:
         f_type = fields[fld]['type']
         if fld in ('parent_left','parent_right'):
             continue
-        if mod[fld] or opts.all:
+        if mod[fld] or opts.all or fld == 'active':
             field = SubElement(record, 'field')
             field.set('name', fld)
             if f_type in('char','text'):
