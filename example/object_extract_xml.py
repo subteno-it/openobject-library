@@ -96,7 +96,7 @@ opts, args = parser.parse_args()
 
 try:
     cnx = Connection(server=opts.server, dbname=opts.dbname, login=opts.user,
-                     password=opts.passwd)
+                     password=opts.passwd, port=opts.port)
 except Exception, e:
     print '%s' % str(e)
     exit(1)
