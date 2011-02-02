@@ -49,6 +49,10 @@ group.add_option('-v', '--verbose', dest='verbose',
                  action='store_true',
                  default=False,
                  help='Add verbose mode')
+group.add_option('', '--fix', dest='fix',
+                 action='store_true',
+                 default=False,
+                 help='If error found on parent store, we fix it')
 parser.add_option_group(group)
 
 opts, args = parser.parse_args()
@@ -101,6 +105,10 @@ try:
                 assert (a2['parent_left']>a['parent_left']) and (a2['parent_right']<a['parent_right'])
 except AssertionError, e:
     logger.error('Fail: %s' % str(e))
+    if opts.fix:
+        logger.info('Begin to fix the problem')
+        model._parent_store_compute()
+        logger.info('End fix')
 
 logger.info('Check End and complete')
 
