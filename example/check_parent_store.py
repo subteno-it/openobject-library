@@ -57,7 +57,7 @@ parser.add_option_group(group)
 
 opts, args = parser.parse_args()
 
-logger = logging.getLogger("importcsv")
+logger = logging.getLogger("check_parent_store")
 ch = logging.StreamHandler()
 if opts.verbose:
     logger.setLevel(logging.DEBUG)
@@ -103,6 +103,7 @@ try:
                 (a2['parent_right']<a['parent_right']))
             if a2[opts.field]==a['id']:
                 assert (a2['parent_left']>a['parent_left']) and (a2['parent_right']<a['parent_right'])
+    logger.info('No problem found')
 except AssertionError, e:
     logger.error('Fail: %s' % str(e))
     if opts.fix:
