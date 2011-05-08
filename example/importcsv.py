@@ -36,6 +36,7 @@ from oobjlib.common import GetParser
 from optparse import OptionGroup
 import os
 import logging
+import csv
 
 parser = GetParser('Import CSV compatible with OpenERP', '0.2')
 group = OptionGroup(parser, "Object arguments",
@@ -133,19 +134,16 @@ def execute_import(filename, connection, separator=',', transaction=False, error
     header = False
     lines = []
     count = 0
-    for line in fp:
+    reader = csv.reader(fp, delimiter=separator)
+    for line in reader:
         count += 1
-        if line == '\n':  # This line is empty
-            logger.debug('line %d: is empty' % count)
-            continue
-        content = line.replace('\n', '').replace('\r', '').replace('"', '').split(separator)
         if not header:
-            header = content
+            header = line
             logger.debug('header: %s' % str(header))
             continue
-        else:
-            lines.append(content)
-            logger.debug('line %d: %s' % (count, str(content)))
+
+        lines.append(line)
+        logger.debug('line: %s' %str(line))
     logger.info('Read the file content is finished')
 
     logger.info('Start import the content in OpenERP (%d datas)' % len(lines))
