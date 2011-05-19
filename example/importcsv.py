@@ -177,7 +177,6 @@ def execute_import(filename, connection, separator=',', transaction=False, error
                 logger.error(str(e))
                 if error_stop:
                     raise StopError(str(e))
-                break
     logger.info('Import finished')
 
 if opts.filename:
