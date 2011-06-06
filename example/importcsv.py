@@ -36,8 +36,9 @@ from oobjlib.common import GetParser
 from optparse import OptionGroup
 import os
 import logging
+import csv
 
-parser = GetParser('Import CSV compatible with OpenERP', '0.1')
+parser = GetParser('Import CSV compatible with OpenERP', '0.2')
 group = OptionGroup(parser, "Object arguments",
         "Application Options")
 group.add_option('-f', '--file', dest='filename',
@@ -64,6 +65,9 @@ group.add_option('-t', '--transaction', dest='transaction',
                  action='store_true',
                  default=False,
                  help='Insert datas in one transaction')
+group.add_option('', '--language', dest='lang',
+                 default='en_US',
+                 help='Specify the language to search on translate field, default en_US')
 parser.add_option_group(group)
 
 opts, args = parser.parse_args()
@@ -94,6 +98,8 @@ if opts.filename:
 
 if opts.directory:
     opts.directory = os.path.expanduser(opts.directory)
+
+logger.info('Language to import data: %s' % opts.lang)
 
 try:
     logger.info('Open connection to "%s:%s" on "%s" with user "%s" ' % (opts.server, opts.port, opts.dbname, opts.user))
@@ -128,31 +134,31 @@ def execute_import(filename, connection, separator=',', transaction=False, error
     header = False
     lines = []
     count = 0
-    for line in fp:
+    reader = csv.reader(fp, delimiter=separator)
+    for line in reader:
         count += 1
-        if line == '\n':  # This line is empty
-            logger.debug('line %d: is empty' % count)
-            continue
-        content = line.replace('\n', '').replace('"', '').split(separator)
         if not header:
-            header = content
+            header = line
             logger.debug('header: %s' % str(header))
             continue
-        else:
-            lines.append(content)
-            logger.debug('line %d: %s' % (count, str(content)))
+
+        lines.append(line)
+        logger.debug('line: %s' %str(line))
     logger.info('Read the file content is finished')
 
     logger.info('Start import the content in OpenERP (%d datas)' % len(lines))
     count = 0
-    ctx = {'defer_parent_store_computation': True}
+    ctx = {
+        'defer_parent_store_computation': True,
+        'lang': opts.lang,
+    }
     if transaction:
         try:
             logger.info('Import %s lines in one transaction' % len(lines))
             res = obj.import_data(header, lines, 'init', '', False, ctx)
             if res[0] == -1:
                 logger.error('%s' % res[2])
-                logger.debug('%s' % str(res[1]))
+                logger.error('%s' % str(res[1]))
             logger.info('End transaction import')
         except Exception, e:
             logger.error(str(e))
@@ -166,12 +172,11 @@ def execute_import(filename, connection, separator=',', transaction=False, error
                 res = obj.import_data(header, [l], 'init', '', False, ctx)
                 if res[0] == -1:
                     logger.error('%s' % res[2])
-                    logger.debug('%s' % str(res[1]))
+                    logger.error('%s' % str(res[1]))
             except Exception, e:
                 logger.error(str(e))
                 if error_stop:
                     raise StopError(str(e))
-                break
     logger.info('Import finished')
 
 if opts.filename:
