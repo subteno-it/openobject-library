@@ -151,7 +151,9 @@ def execute_import(filename, connection, separator=',', transaction=False, error
     ctx = {
         'defer_parent_store_computation': True,
         'lang': opts.lang,
+        'import': True,
     }
+    print ctx
     if transaction:
         try:
             logger.info('Import %s lines in one transaction' % len(lines))
@@ -171,6 +173,8 @@ def execute_import(filename, connection, separator=',', transaction=False, error
             try:
                 res = obj.import_data(header, [l], 'init', '', False, ctx)
                 if res[0] == -1:
+                    logger.error('%s' % repr(l))
+                    logger.error('%s' % repr(ctx))
                     logger.error('%s' % res[2])
                     logger.error('%s' % str(res[1]))
             except Exception, e:
