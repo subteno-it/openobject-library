@@ -20,6 +20,10 @@
 #
 ##############################################################################
 
+"""
+SetupTools configuration file
+"""
+
 from distutils.core import setup
 from oobjlib import release
 
@@ -43,15 +47,15 @@ def find_packages(base):
 
 if os.path.exists("README.rst"):
     import codecs
-    long_description = codecs.open('README.rst', "r", "utf-8").read()
+    LONG_DESCRIPTION = codecs.open('README.rst', "r", "utf-8").read()
 else:
-    long_description = release.long_description
+    LONG_DESCRIPTION = release.long_description
 
 setup(
     name=release.appname,
     version=release.version,
     description=release.description,
-    long_description=long_description,
+    Long_Description=LONG_DESCRIPTION,
     author=release.author,
     author_email=release.author_email,
     license='GPLv3',
