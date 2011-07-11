@@ -194,9 +194,9 @@ for m_id in model_ids:
             elif f_type == 'many2many':
                 dd = ''
                 for d in mod[fld]:
-                    dd += "ref('%s')," % Ir_Model_Data(fields[fld]['relation'], d)
+                    dd += "(4, ref('%s')), " % Ir_Model_Data(fields[fld]['relation'], d)
                 if dd:
-                    field.set('eval', '[(6,0,[%s])]' % dd[:-1])
+                    field.set('eval', '[%s]' % dd[:-2])
                 else:
                     field.set('eval', '[]')
             elif f_type == 'selection':
@@ -232,7 +232,7 @@ for m_id in model_ids:
                     field = SubElement(record, 'field')
                     field.set('name', fld)
                     if f_type in('char', 'text'):
-                        field.text = mod[fld] or ''
+                        field.text = str(mod[fld]) or ''
                     elif f_type in ('int', 'integer'):
                         field.set('eval', mod[fld] and str(mod[fld]) or '0')
                     elif f_type == 'float':
