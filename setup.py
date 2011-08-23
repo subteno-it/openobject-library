@@ -24,7 +24,10 @@
 SetupTools configuration file
 """
 
-from distutils.core import setup
+from distribute_setup import use_setuptools
+use_setuptools()
+
+from setuptools import setup
 from oobjlib import release
 
 import os
