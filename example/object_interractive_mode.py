@@ -30,7 +30,7 @@ import sys
 sys.path.append('../')
 
 from oobjlib.connection import Connection
-from oobjlib.component import Object
+from oobjlib.component import Object, Wizard, Workflow, Report
 from oobjlib.common import GetParser
 from optparse import OptionGroup
 
