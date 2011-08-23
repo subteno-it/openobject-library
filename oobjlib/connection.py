@@ -2,9 +2,9 @@
 ##############################################################################
 #
 #    OpenObject Library
-#    Copyright (C) 2009 Tiny (<http://tiny.be>). Christophe Simonis 
+#    Copyright (C) 2009 Tiny (<http://tiny.be>). Christophe Simonis
 #                  All Rights Reserved
-#    Copyright (C) 2009 Syleam (<http://syleam.fr>). Christophe Chauvet 
+#    Copyright (C) 2009 Syleam (<http://syleam.fr>). Christophe Chauvet
 #                  All Rights Reserved
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -25,6 +25,7 @@
 import xmlrpclib
 from socket import error as socket_error
 
+
 class Connection(object):
     """Create a new database connection"""
     def __init__(self, server="localhost", port=8069, dbname="terp", login=None, password=None):
@@ -33,6 +34,7 @@ class Connection(object):
         self._sock = xmlrpclib.ServerProxy(self._url)
         self.dbname = dbname
         self.login, self.password = login, password
+        self.context = {}
 
         try:
             self.userid = self._sock.login(dbname, login, password)
@@ -43,6 +45,20 @@ class Connection(object):
 
         if not self.userid:
             raise Exception("Unable to connect to database %s using %s" % (dbname, login,))
+
+        # retrieve context for this user
+        try:
+
+            self._ctx_url = "http://%s:%d/xmlrpc/object" % (self.server, self.port)
+            self._ctx_sock = xmlrpclib.ServerProxy(self._ctx_url, allow_none=True)
+            self.context = self._ctx_sock.execute(self.dbname, self.userid, self.password, 'res.users', 'context_get')
+        except socket_error, se:
+            raise Exception('Unable to connect to http://%s:%d: %s' % (self.server, self.port, se.args[1]))
+        except xmlrpclib.Fault, err:
+            raise Exception('%r: %s' % (err.faultCode, err.faultString.encode('utf-8')))
+
+        del self._ctx_url
+        del self._ctx_sock
 
     def __str__(self):
         return '%s [%s]' % (self._url, self.dbname)
