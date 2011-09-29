@@ -51,7 +51,7 @@ except Exception, e:
     exit(1)
 
 mod = Object(cnx, 'ir.model')
-model = mod.search([])
+model = mod.search([('osv_memory', '=', False)])
 
 
 print 80 * '-'
