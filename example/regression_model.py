@@ -35,8 +35,17 @@ sys.path.append('../')
 from oobjlib.connection import Connection
 from oobjlib.component import Object
 from oobjlib.common import GetParser
+from optparse import OptionGroup
+
 
 parser = GetParser('Regression model', '0.1')
+group = OptionGroup(parser, 'Display information',
+                "Others arguments")
+group.add_option('-q', '--quiet', dest='quiet',
+                action='store_true',
+                default=False,
+                help='Reduce output only with error'),
+parser.add_option_group(group)
 opts, args = parser.parse_args()
 
 try:
@@ -90,7 +99,11 @@ for m in mod.read(model):
         footer += 'Objet: %s\n' % m['model']
         footer += 'Message: %s\n' % str(e)
 
-    print '| %s | %s   | %s    | %s   |' % (m['model'].ljust(45) ,search, read, view)
+    if opts.quiet:
+        if (search == 'ERR' or read == 'ERR' or view == 'ERR'):
+            print '| %s | %s   | %s    | %s   |' % (m['model'].ljust(45) ,search, read, view)
+    else:
+        print '| %s | %s   | %s    | %s   |' % (m['model'].ljust(45) ,search, read, view)
 
 print 80 * '*'
 print footer
