@@ -93,7 +93,8 @@ for m in mod.read(model):
     try:
         read = 'NA '
         if t_ids:
-            tr = t.read([t_ids[0]])
+            end_id = min(10, len(t_ids)) - 1
+            tr = t.read(t_ids[0:end_id])
             read = 'OK '
     except Exception, e:
         read = 'ERR'   #'ERR'
