@@ -45,6 +45,9 @@ group.add_option('-q', '--quiet', dest='quiet',
                 action='store_true',
                 default=False,
                 help='Reduce output only with error'),
+group.add_option('-o', '--openerp-version', dest='oerp_version',
+                default=6,
+                help='Indicate the version of OpenERP (5 or 6)')
 parser.add_option_group(group)
 opts, args = parser.parse_args()
 
@@ -57,28 +60,34 @@ try:
         port=opts.port)
 except Exception, e:
     print '%s' % str(e)
-    exit(1)
+    sys.exit(1)
 
 mod = Object(cnx, 'ir.model')
-model = mod.search([('osv_memory', '=', False)])
+
+if opts.oerp_version == '5':
+    print 'version 5'
+    model = mod.search([])
+else:
+    print 'version 6'
+    model = mod.search([('osv_memory', '=', False)])
 
 
 print 80 * '-'
 print '| Model                                         | Search |  Read  | View XML |'
 print 80 * '-'
 
-
 footer = '--- FOOTER REPORT ---\n'
 
 for m in mod.read(model):
-    if m['model'].startswith('ir_'):
+    if m['model'].startswith('ir_') or m['model'].find('wizard') >= 0:
         continue
+
     t = Object(cnx, m['model'])
     try:
         t_ids = t.search([])
         search = ('%d' % len(t_ids)).zfill(4)
     except Exception, e:
-        search = 'ERR '
+        search = 'ERR'
         footer += 'Objet: %s\n' % m['model']
         footer += 'Message: %s\n' % str(e)
     try:
@@ -107,5 +116,8 @@ for m in mod.read(model):
 
 print 80 * '*'
 print footer
+
+if (search == 'ERR' or read == 'ERR' or view == 'ERR'):
+    sys.exit(2)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
