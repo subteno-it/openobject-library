@@ -3,9 +3,9 @@
 ##############################################################################
 #
 #    OpenObject Library
-#    Copyright (C) 2009 Tiny (<http://tiny.be>). Christophe Simonis 
+#    Copyright (C) 2009 Tiny (<http://tiny.be>). Christophe Simonis
 #                  All Rights Reserved
-#    Copyright (C) 2009 Syleam (<http://syleam.fr>). Christophe Chauvet 
+#    Copyright (C) 2009 Syleam (<http://syleam.fr>). Christophe Chauvet
 #                  All Rights Reserved
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -53,10 +53,10 @@ opts, args = parser.parse_args()
 
 try:
     cnx = Connection(
-        server=opts.server, 
-        dbname=opts.dbname, 
-        login=opts.user, 
-        password=opts.passwd, 
+        server=opts.server,
+        dbname=opts.dbname,
+        login=opts.user,
+        password=opts.passwd,
         port=opts.port)
 except Exception, e:
     print '%s' % str(e)
@@ -110,9 +110,9 @@ for m in mod.read(model):
 
     if opts.quiet:
         if (search == 'ERR' or read == 'ERR' or view == 'ERR'):
-            print '| %s | %s   | %s    | %s   |' % (m['model'].ljust(45) ,search, read, view)
+            print '| %s | %s   | %s    | %s   |' % (m['model'].ljust(45), search, read, view)
     else:
-        print '| %s | %s   | %s    | %s   |' % (m['model'].ljust(45) ,search, read, view)
+        print '| %s | %s   | %s    | %s   |' % (m['model'].ljust(45), search, read, view)
 
 print 80 * '*'
 print footer
