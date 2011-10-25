@@ -41,6 +41,10 @@ from optparse import OptionGroup
 parser = GetParser('Regression model', '0.1')
 group = OptionGroup(parser, 'Display information',
                 "Others arguments")
+group.add_option('--all-views', dest='all_views',
+                action='store_true',
+                default=False,
+                help='Test all views, not only the default view'),
 group.add_option('-q', '--quiet', dest='quiet',
                 action='store_true',
                 default=False,
@@ -103,6 +107,12 @@ for m in mod.read(model):
 
     try:
         a = t.fields_view_get()
+        if opts.all_views:
+            v = Object(cnx, 'ir.ui.view')
+            v_ids = v.search([('model', '=', m['model'])])
+            v_data = v.read(v_ids, ['type'])
+            for data in v_data:
+                a = t.fields_view_get(data['id'], data['type'])
         view = 'OK '
     except Exception, e:
         view = 'ERR'
