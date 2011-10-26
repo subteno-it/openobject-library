@@ -3,9 +3,9 @@
 ##############################################################################
 #
 #    OpenObject Library
-#    Copyright (C) 2009 Tiny (<http://tiny.be>). Christophe Simonis 
+#    Copyright (C) 2009 Tiny (<http://tiny.be>). Christophe Simonis
 #                  All Rights Reserved
-#    Copyright (C) 2009 Syleam (<http://syleam.fr>). Christophe Chauvet 
+#    Copyright (C) 2009 Syleam (<http://syleam.fr>). Christophe Chauvet
 #                  All Rights Reserved
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -41,6 +41,10 @@ from optparse import OptionGroup
 parser = GetParser('Regression model', '0.1')
 group = OptionGroup(parser, 'Display information',
                 "Others arguments")
+group.add_option('--all-views', dest='all_views',
+                action='store_true',
+                default=False,
+                help='Test all views, not only the default view'),
 group.add_option('-q', '--quiet', dest='quiet',
                 action='store_true',
                 default=False,
@@ -53,10 +57,10 @@ opts, args = parser.parse_args()
 
 try:
     cnx = Connection(
-        server=opts.server, 
-        dbname=opts.dbname, 
-        login=opts.user, 
-        password=opts.passwd, 
+        server=opts.server,
+        dbname=opts.dbname,
+        login=opts.user,
+        password=opts.passwd,
         port=opts.port)
 except Exception, e:
     print '%s' % str(e)
@@ -93,7 +97,8 @@ for m in mod.read(model):
     try:
         read = 'NA '
         if t_ids:
-            tr = t.read([t_ids[0]])
+            end_id = min(10, len(t_ids)) - 1
+            tr = t.read(t_ids[0:end_id])
             read = 'OK '
     except Exception, e:
         read = 'ERR'   #'ERR'
@@ -102,6 +107,12 @@ for m in mod.read(model):
 
     try:
         a = t.fields_view_get()
+        if opts.all_views:
+            v = Object(cnx, 'ir.ui.view')
+            v_ids = v.search([('model', '=', m['model'])])
+            v_data = v.read(v_ids, ['type'])
+            for data in v_data:
+                a = t.fields_view_get(data['id'], data['type'])
         view = 'OK '
     except Exception, e:
         view = 'ERR'
@@ -110,9 +121,9 @@ for m in mod.read(model):
 
     if opts.quiet:
         if (search == 'ERR' or read == 'ERR' or view == 'ERR'):
-            print '| %s | %s   | %s    | %s   |' % (m['model'].ljust(45) ,search, read, view)
+            print '| %s | %s   | %s    | %s   |' % (m['model'].ljust(45), search, read, view)
     else:
-        print '| %s | %s   | %s    | %s   |' % (m['model'].ljust(45) ,search, read, view)
+        print '| %s | %s   | %s    | %s   |' % (m['model'].ljust(45), search, read, view)
 
 print 80 * '*'
 print footer
