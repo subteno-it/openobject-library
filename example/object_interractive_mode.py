@@ -1,4 +1,4 @@
-#!/usr/bin/python -i
+#!/usr/bin/python
 # --*- coding: utf-8 -*-
 ##############################################################################
 #
@@ -27,6 +27,7 @@ And stay in interractive mode (use python -i to do this)
 """
 
 import sys
+import code
 sys.path.append('../')
 
 from oobjlib.connection import Connection
@@ -59,6 +60,7 @@ except Exception, e:
     print '%s' % str(e)
     exit(1)
 
+
 print 80 * '*'
 print '* A connection was established to %s on database %s with user %s ' % (opts.server, opts.dbname, opts.user)
 print '* Use "cnx" variable for the current connection'
@@ -75,5 +77,7 @@ if opts.model:
 print 80 * '*'
 print '* To exit: enter "exit()" or press "Ctrl + D"'
 print 80 * '*'
+
+code.interact(local=locals())
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
