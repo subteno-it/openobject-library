@@ -27,7 +27,14 @@ This module is compose by component available in OpenObject
 """
 
 import xmlrpclib
+import time
+import base64
+import tempfile
 from socket import error as socket_error
+
+
+class OObjlibException(Exception):
+    pass
 
 
 class Object(object):
@@ -113,6 +120,62 @@ class Workflow(object):
             except xmlrpclib.Fault, err:
                 raise Exception('%r: %s' % (err.faultCode, err.faultString.encode('utf-8')))
         return proxy
+
+
+class Report(object):
+    """
+    Execute de report and retrieve it as attchament
+    """
+    def __init__(self, connection, model, report_name):
+        """
+        :param connection: Instance of the Connection object
+        :param model: name of the model for the report
+        :param report_name: name of the registered report
+        """
+        self._connection = connection
+        self._report_name = report_name
+        self._model = model
+        self._context = {}
+        u = "http://%s:%d/xmlrpc/report" % (connection.server, connection.port)
+        self._sock = xmlrpclib.ServerProxy(u)
+
+    def retrieve(self, ids):
+        """
+        Execute the report and retrieve it
+        """
+        try:
+            id_report = self._sock.report(self._connection.dbname,
+                                    self._connection.userid,
+                                    self._connection.password,
+                                    self._report_name,
+                                    ids,
+                                    {'model': self._model, 'id': ids[0], 'report_type': 'pdf'},
+                                    self._context)
+            time.sleep(5)
+            state = False
+            attempt = 0
+
+            while not state:
+                report = self._sock.report_get(self._connection.dbname, self._connection.userid, self._connection.password, id_report)
+                state = report['state']
+                if not state:
+                    time.sleep(1)
+                attempt += 1
+                if attempt > 200:
+                    raise OObjlibException('Printing aborted, too long delay !')
+
+            filename = tempfile.mkstemp(prefix='oobjlib-', suffix='-report.pdf')
+            string_pdf = base64.decodestring(report['result'])
+            file_pdf = open(filename[1], 'w')
+            file_pdf.write(string_pdf)
+            file_pdf.close()
+
+            return filename[1]
+
+        except socket_error, se:
+            raise Exception('Unable to connect to http://%s:%d: %s' % (self._connection.server, self._connection.port, se.args[1]))
+        except xmlrpclib.Fault, err:
+            raise Exception('%r: %s' % (err.faultCode, err.faultString.encode('utf-8')))
 
 
 def demo():

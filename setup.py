@@ -20,7 +20,14 @@
 #
 ##############################################################################
 
-from distutils.core import setup
+"""
+SetupTools configuration file
+"""
+
+from distribute_setup import use_setuptools
+use_setuptools()
+
+from setuptools import setup
 from oobjlib import release
 
 import os
@@ -43,20 +50,20 @@ def find_packages(base):
 
 if os.path.exists("README.rst"):
     import codecs
-    long_description = codecs.open('README.rst', "r", "utf-8").read()
+    LONG_DESCRIPTION = codecs.open('README.rst', "r", "utf-8").read()
 else:
-    long_description = release.long_description
+    LONG_DESCRIPTION = release.long_description
 
 setup(
     name=release.appname,
     version=release.version,
     description=release.description,
-    long_description=long_description,
+    Long_Description=LONG_DESCRIPTION,
     author=release.author,
     author_email=release.author_email,
     license='GPLv3',
     url=release.url,
     packages=find_packages('oobjlib'),
-    classifiers=filter(None, release.classifiers.split("\n")),)
+    classifiers=[i for i in release.classifiers.split("\n") if i],)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

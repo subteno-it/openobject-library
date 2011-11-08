@@ -1,9 +1,9 @@
-#!/usr/bin/python -i
+#!/usr/bin/python
 # --*- coding: utf-8 -*-
 ##############################################################################
 #
 #    OpenObject Library
-#    Copyright (C) 2009 Syleam (<http://syleam.fr>). Christophe Chauvet 
+#    Copyright (C) 2009 Syleam (<http://syleam.fr>). Christophe Chauvet
 #                  All Rights Reserved
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -27,10 +27,11 @@ And stay in interractive mode (use python -i to do this)
 """
 
 import sys
+import code
 sys.path.append('../')
 
 from oobjlib.connection import Connection
-from oobjlib.component import Object
+from oobjlib.component import Object, Wizard, Workflow
 from oobjlib.common import GetParser
 from optparse import OptionGroup
 
@@ -50,14 +51,15 @@ except SystemExit:
 
 try:
     cnx = Connection(
-        server=opts.server, 
-        dbname=opts.dbname, 
-        login=opts.user, 
-        password=opts.passwd, 
+        server=opts.server,
+        dbname=opts.dbname,
+        login=opts.user,
+        password=opts.passwd,
         port=opts.port)
 except Exception, e:
     print '%s' % str(e)
     exit(1)
+
 
 print 80 * '*'
 print '* A connection was established to %s on database %s with user %s ' % (opts.server, opts.dbname, opts.user)
@@ -75,5 +77,7 @@ if opts.model:
 print 80 * '*'
 print '* To exit: enter "exit()" or press "Ctrl + D"'
 print 80 * '*'
+
+code.interact(local=locals())
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -28,7 +28,17 @@ If you have downloaded a source tarball you can install it
 by doing the following,::
 
     $ python setup.py build
-    # python setup.py install # as root
+    $ sudo python setup.py install
+
+If you want to develop a new functionnality, you can install it 
+by doing the following (in python 2.6 or greater),::
+
+    $ python setup.py develop --user
+
+or simply::
+
+    $ sudo python setup.py develop
+
 
 Quick overview
 ==============
