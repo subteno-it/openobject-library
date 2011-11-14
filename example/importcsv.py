@@ -68,6 +68,10 @@ group.add_option('-t', '--transaction', dest='transaction',
 group.add_option('', '--language', dest='lang',
                  default='en_US',
                  help='Specify the language to search on translate field, default en_US')
+group.add_option('', '--with-inactive', dest='inactive',
+                 action='store_true',
+                 default=False,
+                 help='Extract inactive records')
 parser.add_option_group(group)
 
 opts, args = parser.parse_args()
@@ -153,6 +157,8 @@ def execute_import(filename, connection, separator=',', transaction=False, error
         'lang': opts.lang,
         'import': True,
     }
+    if opts.inactive:
+        ctx['active_test'] = False
     print ctx
     if transaction:
         try:
