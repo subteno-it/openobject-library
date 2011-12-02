@@ -170,7 +170,7 @@ for m_id in model_ids:
             field = SubElement(record, 'field')
             field.set('name', fld)
             if f_type in('char', 'text'):
-                field.text = str(mod[fld]) or ''
+                field.text = unicode(mod[fld]) or ''
             elif f_type in ('int', 'integer'):
                 field.set('eval', mod[fld] and str(mod[fld]) or '0')
             elif f_type == 'float':
