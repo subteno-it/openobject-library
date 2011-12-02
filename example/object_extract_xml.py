@@ -86,6 +86,9 @@ group.add_option('', '--with-inactive', dest='inactive',
 group.add_option('', '--id', dest='id', type=int,
                  default=False,
                  help='Indicate which ID you want to extract')
+group.add_option('', '--ids', dest='ids', type=str,
+                 default=False,
+                 help='Indicate which IDs you want to extract   --ids=id1,id2,...,idn')
 group.add_option('', '--follow-one2many', dest='one2many',
                  action='store_true',
                  default=False,
@@ -142,6 +145,15 @@ if opts.id:
         sys.exit(1)
 
     model_ids = [opts.id]
+elif opts.ids:
+    ids = [ int(x) for x in opts.ids.replace(' ', '').split(',')]
+    for id in ids:
+        if not model.search([('id', '=', id)], 0, 1, 0, {'active_test': False}):
+            print 'ID %d does not exists in the database' % id
+            sys.exit(1)
+
+    model_ids = []
+    model_ids.extend(ids)
 elif opts.inactive:
     count = model.search_count([], {'active_test': False})
     model_ids = model.search([], 0, count, 0, {'active_test': False})
