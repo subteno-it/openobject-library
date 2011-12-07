@@ -3,7 +3,7 @@
 ##############################################################################
 #
 #    OpenObject Library
-#    Copyright (C) 2009 Syleam (<http://syleam.fr>). Christophe Chauvet 
+#    Copyright (C) 2009 Syleam (<http://syleam.fr>). Christophe Chauvet
 #                  All Rights Reserved
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -51,10 +51,10 @@ except SystemExit:
 
 try:
     cnx = Connection(
-        server=opts.server, 
-        dbname=opts.dbname, 
-        login=opts.user, 
-        password=opts.passwd, 
+        server=opts.server,
+        dbname=opts.dbname,
+        login=opts.user,
+        password=opts.passwd,
         port=opts.port)
 except Exception, e:
     print '%s' % str(e)
