@@ -103,6 +103,9 @@ root.set('id', Ir_Model_Data('ir.ui.view', opts.id))
 
 view = model_view.read(opts.id)
 
+if isinstance(view, list):
+    view = view[0]
+
 for f in ['name','model','type','priority','inherit_id','arch']:
     if f == 'inherit_id' and not view[f]:
         continue
