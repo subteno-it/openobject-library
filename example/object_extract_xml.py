@@ -204,8 +204,10 @@ for m_id in model_ids:
                     o2m_dict[fld] = (fields[fld]['relation'], mod[fld])
 
             elif f_type == 'many2one':
-                if mod[fld]:
+                if mod[fld] and isinstance(mod[fld], list):
                     field.set('ref', Ir_Model_Data(fields[fld]['relation'], mod[fld][0]))
+                elif mod[fld] and isinstance(mod[fld], int):
+                    continue  # many2one seem to be a field.reference
                 else:
                     field.set('eval', 'False')
             elif f_type == 'many2many':
