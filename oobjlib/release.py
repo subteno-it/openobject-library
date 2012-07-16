@@ -2,7 +2,7 @@
 ##############################################################################
 #
 #    OpenObject Library
-#    Copyright (C) 2009i-2010 Syleam (<http://syleam.fr>). Christophe Chauvet 
+#    Copyright (C) 2009i-2010 Syleam (<http://syleam.fr>). Christophe Chauvet
 #                  All Rights Reserved
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -24,17 +24,17 @@
 
 name = "OpenObject-Library"
 appname = name.lower()
-version = "1.0.1dev"
-copyright = "Copyright (C) 2009-2011 Christophe CHAUVET <christophe.chauvet@syleam.fr>"
+version = "1.0.1"
+copyright = "Copyright (C) 2009-2012 Christophe CHAUVET <christophe.chauvet@syleam.fr>"
 description = "Web Services library OpenObject Framework"
 author = "Christophe CHAUVET"
 author_email = "christophe.chauvet@syleam.fr"
 url = "https://launchpad.net/openobject-library"
-long_description = """OpenObject-Library is a library to manage 
+long_description = """OpenObject-Library is a library to manage
 OpenObject Server
 """
 classifiers="""
-Development Status :: 4 - Beta
+Development Status :: 5 - Production/Stable
 Environment :: Console
 License :: OSI Approved :: GNU Affero General Public License v3
 Operating System :: OS Independent
