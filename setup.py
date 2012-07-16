@@ -58,7 +58,7 @@ setup(
     name=release.appname,
     version=release.version,
     description=release.description,
-    Long_Description=LONG_DESCRIPTION,
+    long_description=LONG_DESCRIPTION,
     author=release.author,
     author_email=release.author_email,
     license='GPLv3',
