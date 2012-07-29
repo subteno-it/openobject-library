@@ -104,17 +104,38 @@ obj = Object(cnx, opts.model)
 ctx = {'lang': opts.lang}
 if opts.inactive:
     ctx['active_test'] = False
-ids = [int(x.strip()) for x in opts.ids.split(',')]
-fields = opts.fields.split(',')
+
+if not opts.ids:
+    # Get all ids
+    ids = obj.search([])
+else:
+    ids = [int(x.strip()) for x in opts.ids.split(',')]
+
+if not opts.fields:
+    # get all fields
+    fields = obj.fields_get_keys()
+else:
+    fields = opts.fields.split(',')
 
 logger.info('Start execute export on the selected file')
-datas = obj.export_data(ids, fields, ctx)['datas']
+result = obj.export_data(ids, fields, ctx)['datas']
 
-csvWriter = csv.writer(open(filename, 'w'), delimiter=opts.separator, quoting=csv.QUOTE_NONNUMERIC)
+csvWriter = csv.writer(file(filename, 'wb+'), delimiter=opts.separator, quoting=csv.QUOTE_NONNUMERIC)
 csvWriter.writerow(fields)
-for data in datas:
-    csvWriter.writerow(data)
 
+for data in result:
+    row = []
+    for d in data:
+        if isinstance(d, basestring):
+            d = d.replace('\n',' ').replace('\t',' ')
+            try:
+                d = d.encode('utf-8')
+            except:
+                pass
+        if d is False: d = None
+        row.append(d)
+
+    csvWriter.writerow(row)
 
 logger.info('Export done')
 
