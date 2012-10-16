@@ -118,24 +118,34 @@ else:
     fields = opts.fields.split(',')
 
 logger.info('Start execute export on the selected file')
-result = obj.export_data(ids, fields, ctx)['datas']
 
 csvWriter = csv.writer(file(filename, 'wb+'), delimiter=opts.separator, quoting=csv.QUOTE_NONNUMERIC)
 csvWriter.writerow(fields)
 
-for data in result:
-    row = []
-    for d in data:
-        if isinstance(d, basestring):
-            d = d.replace('\n',' ').replace('\t',' ')
-            try:
-                d = d.encode('utf-8')
-            except:
-                pass
-        if d is False: d = None
-        row.append(d)
+ok = True
+offset = 0
+while ok:
+    newids = ids[offset:offset+500]
+    if not newids:
+        ok = False
+        continue
+    result = obj.export_data(newids, fields, ctx)
+    for data in result:
+        row = []
+        for d in data:
+            if isinstance(d, basestring):
+                d = d.replace('\n',' ').replace('\t',' ')
+                try:
+                    d = d.encode('utf-8')
+                except:
+                    pass
+            if d is False: d = None
+            row.append(d)
 
-    csvWriter.writerow(row)
+        csvWriter.writerow(row)
+    if not offset:
+        offset = 1
+    offset += 500
 
 logger.info('Export done')
 
