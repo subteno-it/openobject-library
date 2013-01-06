@@ -35,6 +35,7 @@ from oobjlib.component import Object
 from oobjlib.common import GetParser
 from optparse import OptionGroup
 import os
+import glob
 import logging
 import csv
 
@@ -43,7 +44,7 @@ group = OptionGroup(parser, "Object arguments",
         "Application Options")
 group.add_option('-f', '--file', dest='filename',
                  default=False,
-                 help='Enter the name of the file to import')
+                 help='Enter the name of the file to import, you can use wildard as 100-product.product_*.csv')
 group.add_option('','--directory', dest='directory',
                  default=False,
                  help='Indicate teh directory to scan file')
@@ -128,7 +129,10 @@ def execute_import(filename, connection, separator=',', transaction=False, error
     Read the file, and launched import_data
     """
     model = filename.split('/').pop().replace('.csv', '')
-    model = model[model.find('-') + 1:]
+    if model.find('_') > 4:
+        model = model[model.find('-') + 1:model.find('_')]
+    else:
+        model = model[model.find('-') + 1:]
     logger.debug('model: %s' % model)
 
     obj = Object(connection, model)
@@ -190,21 +194,28 @@ def execute_import(filename, connection, separator=',', transaction=False, error
     logger.info('Import finished')
 
 if opts.filename:
-    # Check if the file exists
-    if not os.path.exists(opts.filename):
-        logger.error("File %s seem doesn't exists" % opts.filename)
-        sys.exit(2)
+    # If we have a wildcard, we search corresponding file to made a loop:
+    list_file = []
+    if opts.filename.find('*') >= 4:
+        list_file = glob.glob(opts.filename)
+        list_file.sort()
+    else:
+        list_file = [opts.filename]
 
-    # recherche du mon de l'objet dans le nom du fichier sans l'extension
-    fn = opts.filename.split('/').pop()
-    if not fn.endswith('.csv'):
-        logger.error('File must have a CSV extension')
-        sys.exit(4)
-    logger.info('Start execute import on the selected file')
-    execute_import(opts.filename, cnx, opts.separator, opts.transaction)
+    for filename in list_file:
+        if not os.path.exists(filename):
+            logger.error("File %s seem doesn't exists" % i)
+            sys.exit(2)
+
+        # recherche du mon de l'objet dans le nom du fichier sans l'extension
+        fn = filename.split('/').pop()
+        if not fn.endswith('.csv'):
+            logger.error('File must have a CSV extension')
+            sys.exit(4)
+        logger.info('Start execute import on %s file' % filename)
+        execute_import(filename, cnx, opts.separator, opts.transaction)
 
 elif opts.directory:
-    import glob
     list_file = glob.glob(os.path.join(opts.directory, '*.csv'))
     list_file.sort()
     for i in list_file:
@@ -219,7 +230,5 @@ else:
     logger.error('no specify --filename or --directory option')
 
 logger.info('Import done')
-
-
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
