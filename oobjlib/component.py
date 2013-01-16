@@ -26,11 +26,9 @@
 This module is compose by component available in OpenObject
 """
 
-import xmlrpclib
 import time
 import base64
 import tempfile
-from socket import error as socket_error
 
 
 class OObjlibException(Exception):
@@ -44,25 +42,19 @@ class Object(object):
     def __init__(self, connection, model):
         self._connection = connection
         self._model = model
-        self._url = "http://%s:%d/xmlrpc/object" % (connection.server, connection.port)
-        self._sock = xmlrpclib.ServerProxy(self._url, allow_none=True)
 
     def __getattr__(self, name):
-        def proxy(*args, **kwargs):
-            try:
-                return self._sock.execute(self._connection.dbname, self._connection.userid, self._connection.password, self._model, name, *args, **kwargs)
-            except socket_error, se:
-                raise Exception('Unable to connect to http://%s:%d: %s' % (self._connection.server, self._connection.port, se.args[1]))
-            except xmlrpclib.Fault, err:
-                raise Exception('%r: %s' % (err.faultCode, err.faultString.encode('utf-8')))
-        return proxy
+        """
+        Forward all method calls to the socket
+        """
+        return lambda *args, **kwargs: self._connection._sock.object('execute', self._connection.dbname, self._connection.userid, self._connection.password, self._model, name, *args, **kwargs)
 
     def select(self, domain=None, fields=None):
         ids = self.search(domain or [])
         return self.read(ids, fields or [])
 
     def __str__(self,):
-        return '%s [%s]' % (self._url, self._model)
+        return "%s '%s' <%s@%s:%d [%s]>" % (self.__class__.__name__, self._model, self._connection.login, self._connection.server, self._connection.port, self._connection.dbname)
 
 
 class Wizard(object):
@@ -72,30 +64,10 @@ class Wizard(object):
     def __init__(self, connection, name):
         self._connection = connection
         self._name = name
-        u = "http://%s:%d/xmlrpc/wizard" % (connection.server, connection.port)
-        self._sock = xmlrpclib.ServerProxy(u)
-        try:
-            self._id = self._sock.create(self._connection.dbname,
-                                         self._connection.userid,
-                                         self._connection.password,
-                                         self._name)
-        except socket_error, se:
-            raise Exception('Unable to connect to http://%s:%d: %s' % (self._connection.server, self._connection.port, se.args[1]))
-        except xmlrpclib.Fault, err:
-            raise Exception('%r: %s' % (err.faultCode, err.faultString.encode('utf-8')))
+        self._id = self._connection._sock.wizard('create', self._connection.dbname, self._connection.userid, self._connection.password, self._name)
 
     def __getattr__(self, state):
-        def proxy(**kwargs):
-            try:
-                return self._sock.execute(self._connection.dbname,
-                                          self._connection.userid,
-                                          self._connection.password,
-                                          self._id, kwargs, state)
-            except socket_error, se:
-                raise Exception('Unable to connect to http://%s:%d: %s' % (self._connection.server, self._connection.port, se.args[1]))
-            except xmlrpclib.Fault, err:
-                raise Exception('%r: %s' % (err.faultCode, err.faultString.encode('utf-8')))
-        return proxy
+        return lambda *args, **kwargs: self._connection._sock.wizard('execute', self._connection.dbname, self._connection.userid, self._connection.password, self._id, kwargs, state)
 
 
 class Workflow(object):
@@ -105,21 +77,9 @@ class Workflow(object):
     def __init__(self, connection, model):
         self._connection = connection
         self._model = model
-        u = "http://%s:%d/xmlrpc/object" % (connection.server, connection.port)
-        self._sock = xmlrpclib.ServerProxy(u)
 
     def __getattr__(self, name):
-        def proxy(oid):
-            try:
-                return self._sock.exec_workflow(self._connection.dbname,
-                                            self._connection.userid,
-                                            self._connection.password,
-                                            self._model, name, oid)
-            except socket_error, se:
-                raise Exception('Unable to connect to http://%s:%d: %s' % (self._connection.server, self._connection.port, se.args[1]))
-            except xmlrpclib.Fault, err:
-                raise Exception('%r: %s' % (err.faultCode, err.faultString.encode('utf-8')))
-        return proxy
+        return lambda oid: self._connection._sock.object('exec_workflow', self._connection.dbname, self._connection.userid, self._connection.password, self._model, name, oid)
 
 
 class Report(object):
@@ -135,47 +95,35 @@ class Report(object):
         self._connection = connection
         self._report_name = report_name
         self._model = model
-        self._context = {}
-        u = "http://%s:%d/xmlrpc/report" % (connection.server, connection.port)
-        self._sock = xmlrpclib.ServerProxy(u)
 
     def retrieve(self, ids):
         """
         Execute the report and retrieve it
         """
-        try:
-            id_report = self._sock.report(self._connection.dbname,
-                                    self._connection.userid,
-                                    self._connection.password,
-                                    self._report_name,
-                                    ids,
-                                    {'model': self._model, 'id': ids[0], 'report_type': 'pdf'},
-                                    self._context)
-            time.sleep(5)
-            state = False
-            attempt = 0
+        id_report = self._connection._sock.report('report', self._connection.dbname, self._connection.userid, self._connection.password, self._report_name, ids, {
+            'model': self._model, 'id': ids[0], 'report_type': 'pdf'
+        }, self._connection.context)
 
-            while not state:
-                report = self._sock.report_get(self._connection.dbname, self._connection.userid, self._connection.password, id_report)
-                state = report['state']
-                if not state:
-                    time.sleep(1)
-                attempt += 1
-                if attempt > 200:
-                    raise OObjlibException('Printing aborted, too long delay !')
+        time.sleep(5)
+        state = False
+        attempt = 0
 
-            filename = tempfile.mkstemp(prefix='oobjlib-', suffix='-report.pdf')
-            string_pdf = base64.decodestring(report['result'])
-            file_pdf = open(filename[1], 'w')
-            file_pdf.write(string_pdf)
-            file_pdf.close()
+        while not state:
+            report = self._connection._sock.report('report_get', self._connection.dbname, self._connection.userid, self._connection.password, id_report)
+            state = report['state']
+            if not state:
+                time.sleep(1)
+            attempt += 1
+            if attempt > 200:
+                raise OObjlibException('Printing aborted, too long delay !')
 
-            return filename[1]
+        filename = tempfile.mkstemp(prefix='oobjlib-', suffix='-report.pdf')
+        string_pdf = base64.decodestring(report['result'])
+        file_pdf = open(filename[1], 'w')
+        file_pdf.write(string_pdf)
+        file_pdf.close()
 
-        except socket_error, se:
-            raise Exception('Unable to connect to http://%s:%d: %s' % (self._connection.server, self._connection.port, se.args[1]))
-        except xmlrpclib.Fault, err:
-            raise Exception('%r: %s' % (err.faultCode, err.faultString.encode('utf-8')))
+        return filename[1]
 
 
 def demo():
@@ -183,8 +131,8 @@ def demo():
     db = Database()
     print repr(db.list())
 
-    cnx = Connection(dbname="demo", login="admin", password="admin")
-    modules = Object(cnx, "ir.module.module")
+    cnx = Connection(dbname='demo', login='admin', password='admin')
+    modules = Object(cnx, 'ir.module.module')
 
     ids = modules.search([('state', '=', 'installed')])
     for p in modules.read(ids, ['name']):

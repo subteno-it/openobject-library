@@ -22,75 +22,75 @@
 #
 ##############################################################################
 
-import xmlrpclib
-from socket import error as socket_error
+import netrpclib
 
 
-class Connection(object):
+class OobjBase(object):
+    __slots__ = ('server', 'port', '_sock', 'server_version')
+
+    def __init__(self, server='localhost', port=8070):
+        self.server = server
+        self.port = int(port)
+        self._sock = netrpclib.NetrpcSocket(self.server, self.port)
+        # Workaround for connection errors, waiting for a better solution
+        self.server_version = self._sock.db('server_version').split('.')
+        if self.server_version[0] <= '5':
+            self._sock.disconnect()
+            self._sock = netrpclib.NetrpcSocket(self.server, self.port, reconnect=True)
+
+
+class Connection(OobjBase):
     """Create a new database connection"""
-    __slots__ = ('server', 'port', '_url', '_sock', 'dbname', 'login', 'password', 'userid')
-    def __init__(self, server="localhost", port=8069, dbname="terp", login=None, password=None):
-        self.server, self.port = server, int(port)
-        self._url = "http://%s:%d/xmlrpc/common" % (self.server, self.port)
-        self._sock = xmlrpclib.ServerProxy(self._url)
+    __slots__ = ('dbname', 'login', 'password', 'userid', 'context')
+
+    def __init__(self, server='localhost', port=8070, dbname='demo', login=None, password=None):
+        super(Connection, self).__init__(server=server, port=port)
         self.dbname = dbname
-        self.login, self.password = login, password
-        self.context = {}
+        self.login = login
+        self.password = password
 
-        try:
-            self.userid = self._sock.login(dbname, login, password)
-        except socket_error, se:
-            raise Exception('Unable to connect to http://%s:%d: %s' % (self.server, self.port, se.args[1]))
-        except xmlrpclib.Fault, err:
-            raise Exception('%s: %s' % (err.faultCode.encode('utf-8'), err.faultString.encode('utf-8')))
-
-        if not self.userid:
-            raise Exception("Unable to connect to database %s using %s" % (dbname, login,))
-
-        # retrieve context for this user
-        try:
-
-            self._ctx_url = "http://%s:%d/xmlrpc/object" % (self.server, self.port)
-            self._ctx_sock = xmlrpclib.ServerProxy(self._ctx_url, allow_none=True)
-            self.context = self._ctx_sock.execute(self.dbname, self.userid, self.password, 'res.users', 'context_get')
-        except socket_error, se:
-            raise Exception('Unable to connect to http://%s:%d: %s' % (self.server, self.port, se.args[1]))
-        except xmlrpclib.Fault, err:
-            raise Exception('%r: %s' % (err.faultCode, err.faultString.encode('utf-8')))
-
-        del self._ctx_url
-        del self._ctx_sock
+        # Login on the database
+        self.userid = self._sock.common('login', dbname, login, password)
+        # Retrieve context for this user
+        self.context = self._sock.object('execute', self.dbname, self.userid, self.password, 'res.users', 'context_get')
 
     def __str__(self):
-        return '%s [%s]' % (self._url, self.dbname)
+        """
+        Human readable representation of this object
+        """
+        return '%s <%s@%s:%d [%s]>' % (self.__class__.__name__, self.login, self.server, self.port, self.dbname)
 
     def __repr__(self):
-        return self.__str__()
+        """
+        Pythonic representation of this object
+        """
+        return "oobjlib.connection.%s('%s', %d, '%s', '%s', '%s')" % (self.__class__.__name__, self.server, self.port, self.dbname, self.login, self.password)
 
 
-class Database(object):
+class Database(OobjBase):
     """Instanciate Database Object"""
-    __slots__ = ('supadminpass', 'server', 'port', '_url', '_sock')
-    def __init__(self, server="localhost", port=8069, supadminpass='admin'):
+    __slots__ = ('supadminpass')
+
+    def __init__(self, server='localhost', port=8170, supadminpass='admin'):
+        super(Database, self).__init__(server=server, port=port)
         self.supadminpass = supadminpass
-        self.server, self.port = server, int(port)
-        self._url = "http://%s:%d/xmlrpc/db" % (self.server, self.port)
-        self._sock = xmlrpclib.ServerProxy(self._url)
 
     def __getattr__(self, name):
-        def proxy(*args, **kwargs):
-            return getattr(self._sock, name)(self.supadminpass, *args, **kwargs)
-        return proxy
-
-    def list(self):
-        """Return the list of database"""
-        return self._sock.list()
+        """
+        Forward all method calls to the socket
+        """
+        return lambda *args, **kwargs: self._sock.db(name, self.supadminpass, *args, **kwargs)
 
     def __str__(self):
-        """representation of this object"""
-        return '%s [%s]' % (self._url, self.supadminpass)
+        """
+        Human readable representation of this object
+        """
+        return '%s <%s:%d [%s]>' % (self.__class__.__name__, self.server, self.port, self.supadminpass)
 
     def __repr__(self):
-        return self.__str__()
+        """
+        Pythonic representation of this object
+        """
+        return "oobjlib.connection.%s('%s', %d, '%s')" % (self.__class__.__name__, self.server, self.port, self.supadminpass)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

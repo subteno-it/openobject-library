@@ -26,7 +26,7 @@
 Common.py containt common information from all test files
 """
 
-from optparse import OptionParser, OptionGroup
+from optparse import OptionParser
 import os
 
 
@@ -56,8 +56,8 @@ def GetParser(appname, version):
                       default=os.environ.get('OERP_SERVER', 'localhost'),
                       help='Indicate the server name or IP (default: localhost)')
     parser.add_option('-p', '--port', dest='port',
-                      default=os.environ.get('OERP_PORT', 8069),
-                      help='Port (default: 8069)')
+                      default=os.environ.get('OERP_PORT', 8070),
+                      help='Port (default: 8070)')
     parser.add_option('-d', '--dbname', dest='dbname',
                       default=os.environ.get('OERP_DATABASE', 'demo'),
                       help='Name of the database (default: demo)')
