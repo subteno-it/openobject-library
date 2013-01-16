@@ -97,6 +97,12 @@ class NetrpcSocket:
         else:
             return res[0]
 
+    def __getattr__(self, name):
+        """
+        Forward all method calls to the remote
+        """
+        return lambda *args, **kwargs: self.send((name,) + args, **kwargs)
+
 if __name__ == '__main__':
     def message(title='', traceback=None):
         res = '---[ %s ]' % title
