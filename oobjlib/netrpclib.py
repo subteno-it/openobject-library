@@ -45,24 +45,22 @@ class Fault(Exception):
         self.args = (eCode, eString)
 
 
-class NetrpcSocket:
+class NetrpcSocket(object):
     """
     NETRPC Socket
     """
-    __slots__ = ('sock')
+    __slots__ = ('host', 'port', 'timeout', 'sock')
 
-    def __init__(self, sock=None, timeout=120):
-        if sock is None:
-            self.sock = socket(AF_INET, SOCK_STREAM)
-        else:
-            self.sock = sock
-        self.sock.settimeout(timeout)
+    def __init__(self, host, port, timeout=120):
+        self.host = host
+        self.port = port
+        self.timeout = timeout
 
-    def connect(self, host, port=False):
-        if not port:
-            protocol, buf = host.split('//')
-            host, port = buf.split(':')
-        self.sock.connect((host, int(port)))
+    def connect(self):
+        self.sock = socket(AF_INET, SOCK_STREAM)
+        self.sock.settimeout(self.timeout)
+        self.sock.connect((self.host, self.port))
+        self.sock.settimeout(None)
 
     def disconnect(self):
         # on Mac, the connection is automatically shutdown when the server disconnect.
@@ -72,8 +70,12 @@ class NetrpcSocket:
         self.sock.close()
 
     def send(self, msg, exception=False, traceback=None):
+        self.connect()
         msg = dumps([msg, traceback])
         self.sock.sendall('%8d%s%s' % (len(msg), exception and "1" or "0", msg))
+        res = self.recv()
+        self.disconnect()
+        return res
 
     def recv(self):
         def read(socket, size):
@@ -115,13 +117,13 @@ if __name__ == '__main__':
         print res
 
     net = NetrpcSocket()
-    net.connect('localhost', 8070)
-    net.send(('db', 'list'))
-    res = net.recv()
+    net.connect()
+    res = net.db('list')
     net.disconnect()
     try:
-        assert type(res) == type([]), 'result is not a list []'
+        assert isinstance(res, list), 'result is not a list []'
         message('List all databases')
+        print '\n'.join(res)
     except AssertionError, e:
         message('List all databases', e.message)
 
