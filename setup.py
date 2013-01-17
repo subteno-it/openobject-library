@@ -56,7 +56,7 @@ else:
 
 setup(
     name=release.appname,
-    version='2.0',
+    version='2.0.1',
     description=release.description,
     long_description=LONG_DESCRIPTION,
     author=release.author,
