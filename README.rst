@@ -1,17 +1,16 @@
-##############################
- oobjlib - OpenObject Library
-##############################
+oobjlib - OpenObject Library
+============================
 
-:Version: 1.0.1
+:Version: 2.0
 
-`openobject-library` is a library to interract with the OpenERP Framework, known as `OpenObject`_
+`openobject-library` is a library to interract with the OpenERP Framework, known as `OpenObject`_ with NETRPC
 
 
 .. _`OpenObject`: https://launchpad.net/openobject
 
 
 Installation
-============
+------------
 
 You can install `oobjlib` either via the Python Package Index (PyPI)
 or from source.
@@ -41,7 +40,7 @@ or simply::
 
 
 Quick overview
-==============
+--------------
 
 ::
 
@@ -49,7 +48,7 @@ Quick overview
     from oobjlib.connection import Database
     
     try:
-        db = Database(server='localhost', port=8069)
+        db = Database(server='localhost', port=8070)
     except Exception, e:
         print '%s' % repr(e)
         sys.exit(1)
@@ -61,7 +60,7 @@ This example retrieve all databases and print one line per database
 
 
 Licence
-=======
+-------
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
