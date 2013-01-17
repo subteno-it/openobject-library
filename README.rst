@@ -2,7 +2,7 @@
  oobjlib - OpenObject Library
 ##############################
 
-:Version: 1.0.0
+:Version: 1.0.1
 
 `openobject-library` is a library to interract with the OpenERP Framework, known as `OpenObject`_
 
