@@ -2,9 +2,9 @@
 ##############################################################################
 #
 #    OpenObject Library
-#    Copyright (C) 2009 Tiny (<http://tiny.be>). Christophe Simonis 
+#    Copyright (C) 2009 Tiny (<http://tiny.be>). Christophe Simonis
 #                  All Rights Reserved
-#    Copyright (C) 2009 Syleam (<http://syleam.fr>). Christophe Chauvet 
+#    Copyright (C) 2009-2013 Syleam (<http://syleam.fr>). Christophe Chauvet
 #                  All Rights Reserved
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -21,5 +21,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
+
+__version__ = '1.0'
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
