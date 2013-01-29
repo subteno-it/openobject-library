@@ -3,6 +3,14 @@ OpenObject Library
 
 Web Services library OpenObject Framework
 
+Version 2.0.2
+-------------
+
+Release date to be decided.
+
+
+* Add better exception for OObjlibException
+
 Version 2.0.1
 -------------
 

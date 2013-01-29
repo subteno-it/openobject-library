@@ -32,7 +32,9 @@ import tempfile
 
 
 class OObjlibException(Exception):
-    pass
+
+    def __init__(self, message):
+        self.message = message
 
 
 class Object(object):
@@ -47,7 +49,10 @@ class Object(object):
         """
         Forward all method calls to the socket
         """
-        return lambda *args, **kwargs: self._connection._sock.object('execute', self._connection.dbname, self._connection.userid, self._connection.password, self._model, name, *args, **kwargs)
+        try:
+            return lambda *args, **kwargs: self._connection._sock.object('execute', self._connection.dbname, self._connection.userid, self._connection.password, self._model, name, *args, **kwargs)
+        except Exception, e:
+            raise OObjlibException(str(e))
 
     def select(self, domain=None, fields=None):
         ids = self.search(domain or [])
@@ -67,7 +72,10 @@ class Wizard(object):
         self._id = self._connection._sock.wizard('create', self._connection.dbname, self._connection.userid, self._connection.password, self._name)
 
     def __getattr__(self, state):
-        return lambda *args, **kwargs: self._connection._sock.wizard('execute', self._connection.dbname, self._connection.userid, self._connection.password, self._id, kwargs, state)
+        try:
+            return lambda *args, **kwargs: self._connection._sock.wizard('execute', self._connection.dbname, self._connection.userid, self._connection.password, self._id, kwargs, state)
+        except Exception, e:
+            raise OObjlibException(str(e))
 
 
 class Workflow(object):
@@ -79,7 +87,10 @@ class Workflow(object):
         self._model = model
 
     def __getattr__(self, name):
-        return lambda oid: self._connection._sock.object('exec_workflow', self._connection.dbname, self._connection.userid, self._connection.password, self._model, name, oid)
+        try:
+            return lambda oid: self._connection._sock.object('exec_workflow', self._connection.dbname, self._connection.userid, self._connection.password, self._model, name, oid)
+        except Exception, e:
+            raise OObjlibException(str(e))
 
 
 class Report(object):
@@ -134,9 +145,12 @@ def demo():
     cnx = Connection(dbname='demo', login='admin', password='admin')
     modules = Object(cnx, 'ir.module.module')
 
-    ids = modules.search([('state', '=', 'installed')])
-    for p in modules.read(ids, ['name']):
-        print p['name']
+    try:
+        ids = modules.search([('state', '=', 'installed')])
+        for p in modules.read(ids, ['name']):
+            print p['name']
+    except OObjlibException, e:
+        print 'Error: %s' % e.message
 
 if __name__ == '__main__':
     demo()
