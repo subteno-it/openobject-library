@@ -79,6 +79,9 @@ def set_init_version(version):
     info('Setting __init__.py version to %s', version)
     set_filename_version('oobjlib/__init__.py', version, '__version__')
 
+def set_release_version(version):
+    info('Setting release.py version to %s', version)
+    set_filename_version('oobjlib/release.py', version, 'version')
 
 def set_setup_version(version):
     info('Setting setup.py version to %s', version)
@@ -139,6 +142,7 @@ def main():
         fail('You have uncommitted changes in git')
 
     set_init_version(version)
+    set_release_version(version)
     set_setup_version(version)
     make_git_commit('Bump version number to %s', version)
     make_git_tag(version)
