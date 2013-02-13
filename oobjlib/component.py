@@ -30,11 +30,7 @@ import time
 import base64
 import tempfile
 
-
-class OObjlibException(Exception):
-
-    def __init__(self, message):
-        self.message = message
+from exceptions import OObjlibException
 
 
 class Object(object):
