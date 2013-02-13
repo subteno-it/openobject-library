@@ -148,6 +148,7 @@ def main():
     make_git_tag(version)
     build_and_upload()
     set_init_version(dev_version)
+    set_release_version(dev_version)
     set_setup_version(dev_version)
 
 
