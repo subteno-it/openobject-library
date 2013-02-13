@@ -8,6 +8,12 @@ help:
 	@echo "test    Launch unittest and display the result"
 	@echo "jenkins Create a xUnit XML file to display result in JenkinsCI"
 
+audit:
+	python setup.py audit
+
+release:
+	python scripts/make-release.py
+
 test:
 	@echo "If import failed launch this command before test target"
 	@echo "export PYTHONPATH=./"
