@@ -1,3 +1,5 @@
 *.pyc
 dist/*
 openobject_library.egg-info/*
+build/*
+distribute-*
