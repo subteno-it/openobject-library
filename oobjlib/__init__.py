@@ -22,6 +22,6 @@
 #
 ##############################################################################
 
-__version__ = '2.0.2-dev'
+__version__ = '2.0.2'
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
