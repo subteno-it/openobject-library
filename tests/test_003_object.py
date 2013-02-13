@@ -31,7 +31,7 @@ import pytest
 
 def setup_module(module):
     try:
-        module.TestConnection.cnx = Connection(
+        module.TestObject.cnx = Connection(
             server=OERPHOST,
             port=OERPPORT,
             dbname=OERPNAME,
@@ -41,16 +41,22 @@ def setup_module(module):
         pytest.fail('Error %s' % e.message)
 
 
-class TestConnection(object):
+class TestObject(object):
 
-    def test_module_list(self):
+    def test_res_partner(self):
         try:
-            module = Object(self.cnx, 'ir.module.module')
-            mod_ids = module.search([('state', '=', 'installed')])
-            mod_list = [x['name'] for x in module.read(mod_ids, ['name'])]
+            partner = Object(self.cnx, 'res.partner')
+            mod_ids = partner.search([('customer', '=', True)])
+            assert len(mod_ids) >= 1
+            current_partner = partner.read(mod_ids[0], ['name'])
         except OObjlibException, e:
             pytest.fail(e.message)
 
-        assert 'base' in mod_list
+    def test_res_partner_view(self):
+        try:
+            partner = Object(self.cnx, 'res.partner')
+            partner.fields_view_get()
+        except OObjlibException, e:
+            pytest.fail(e.message)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
