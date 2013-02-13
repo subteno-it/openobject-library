@@ -62,9 +62,8 @@ class NetrpcSocket(object):
             self.sock.settimeout(self.timeout)
             self.sock.connect((self.host, self.port))
             self.sock.settimeout(None)
-        except Exception, e:
+        except Exception:
             raise Fault('Connection error', '%s(%d)' % (self.host, self.port))
-
 
     def disconnect(self):
         # on Mac, the connection is automatically shutdown when the server disconnect.
