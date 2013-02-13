@@ -6,10 +6,11 @@ Web Services library OpenObject Framework
 Version 2.0.2
 -------------
 
-Release date to be decided.
-
+Released on February 13th 2013
 
 * Add better exception for OObjlibException
+* Add UnitTest with pytest
+* Add audit command in setup.py
 
 Version 2.0.1
 -------------
