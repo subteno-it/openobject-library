@@ -91,7 +91,7 @@ else:
 
 setup(
     name=release.appname,
-    version='2.0.2',
+    version='2.1-dev',
     description=release.description,
     long_description=LONG_DESCRIPTION,
     author=release.author,
