@@ -21,7 +21,7 @@
 ##############################################################################
 
 """
-NETRPC Library, Netrpc is more faster than xmlrpc
+NETRPC Library, NetRPC is more faster than xmlrpc
 This implementation is based on xmlrpclib
 """
 from socket import socket
@@ -57,10 +57,14 @@ class NetrpcSocket(object):
         self.timeout = timeout
 
     def connect(self):
-        self.sock = socket(AF_INET, SOCK_STREAM)
-        self.sock.settimeout(self.timeout)
-        self.sock.connect((self.host, self.port))
-        self.sock.settimeout(None)
+        try:
+            self.sock = socket(AF_INET, SOCK_STREAM)
+            self.sock.settimeout(self.timeout)
+            self.sock.connect((self.host, self.port))
+            self.sock.settimeout(None)
+        except Exception, e:
+            raise Fault('Connection error', '%s(%d)' % (self.host, self.port))
+
 
     def disconnect(self):
         # on Mac, the connection is automatically shutdown when the server disconnect.
