@@ -24,6 +24,8 @@
 
 import netrpclib
 
+from exceptions import OObjlibException
+
 
 class OobjBase(object):
     __slots__ = ('server', 'port', '_sock', 'server_version')
@@ -33,10 +35,13 @@ class OobjBase(object):
         self.port = int(port)
         self._sock = netrpclib.NetrpcSocket(self.server, self.port)
         # Workaround for connection errors, waiting for a better solution
-        self.server_version = self._sock.db('server_version').split('.')
-        if self.server_version[0] <= '5':
-            self._sock.disconnect()
-            self._sock = netrpclib.NetrpcSocket(self.server, self.port, reconnect=True)
+        try:
+            self.server_version = self._sock.db('server_version').split('.')
+            if self.server_version[0] <= '5':
+                self._sock.disconnect()
+                self._sock = netrpclib.NetrpcSocket(self.server, self.port, reconnect=True)
+        except netrpclib.Fault, e:
+            raise OObjlibException('[%s] %s' % (e.faultCode, e.faultString))
 
 
 class Connection(OobjBase):
@@ -49,10 +54,13 @@ class Connection(OobjBase):
         self.login = login
         self.password = password
 
-        # Login on the database
-        self.userid = self._sock.common('login', dbname, login, password)
-        # Retrieve context for this user
-        self.context = self._sock.object('execute', self.dbname, self.userid, self.password, 'res.users', 'context_get')
+        try:
+            # Login on the database
+            self.userid = self._sock.common('login', dbname, login, password)
+            # Retrieve context for this user
+            self.context = self._sock.object('execute', self.dbname, self.userid, self.password, 'res.users', 'context_get')
+        except netrpclib.Fault, e:
+            raise OObjlibException('[%s] %s' % (e.faultCode, e.faultString))
 
     def __str__(self):
         """
@@ -79,7 +87,10 @@ class Database(OobjBase):
         """
         Forward all method calls to the socket
         """
-        return lambda *args, **kwargs: self._sock.db(name, self.supadminpass, *args, **kwargs)
+        try:
+            return lambda *args, **kwargs: self._sock.db(name, self.supadminpass, *args, **kwargs)
+        except netrpclib.Fault, e:
+            raise OObjlibException('[%s] %s' % (e.faultCode, e.faultString))
 
     def __str__(self):
         """
