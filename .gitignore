@@ -4,3 +4,4 @@ openobject_library.egg-info/*
 build/*
 distribute-*
 tests/__pycache__
+doc/build/*
