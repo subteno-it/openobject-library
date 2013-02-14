@@ -29,7 +29,7 @@ copyright = "Copyright (C) 2009-2012 Christophe CHAUVET <christophe.chauvet@syle
 description = "Web Services library OpenObject Framework"
 author = "Christophe CHAUVET"
 author_email = "christophe.chauvet@syleam.fr"
-url = "https://launchpad.net/openobject-library"
+url = "https://github.com/syleam/openobject-library"
 long_description = """OpenObject-Library is a library to manage
 OpenObject Server
 """
