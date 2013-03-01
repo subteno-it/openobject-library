@@ -3,12 +3,13 @@ OpenObject Library
 
 Web Services library OpenObject Framework
 
-Version 2.1
------------
+Version 2.0.3
+-------------
 
-Release date to be decided.
+Release on March 1st 2013
 
 * Add Sphinx documentation 
+* Fix issue with NETRPC in V5
 
 Version 2.0.2
 -------------
