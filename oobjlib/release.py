@@ -24,7 +24,7 @@
 
 name = "OpenObject-Library"
 appname = name.lower()
-version = '2.1-dev'
+version = '2.0.3'
 copyright = "Copyright (C) 2009-2012 Christophe CHAUVET <christophe.chauvet@syleam.fr>"
 description = "Web Services library OpenObject Framework"
 author = "Christophe CHAUVET"
