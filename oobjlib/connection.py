@@ -34,14 +34,6 @@ class OobjBase(object):
         self.server = server
         self.port = int(port)
         self._sock = netrpclib.NetrpcSocket(self.server, self.port)
-        # Workaround for connection errors, waiting for a better solution
-        try:
-            self.server_version = self._sock.db('server_version').split('.')
-            if self.server_version[0] <= '5':
-                self._sock.disconnect()
-                self._sock = netrpclib.NetrpcSocket(self.server, self.port, reconnect=True)
-        except netrpclib.Fault, e:
-            raise OObjlibException('[%s] %s' % (e.faultCode, e.faultString))
 
 
 class Connection(OobjBase):
