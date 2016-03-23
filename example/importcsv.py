@@ -41,11 +41,11 @@ import csv
 
 parser = GetParser('Import CSV compatible with OpenERP', '0.2')
 group = OptionGroup(parser, "Object arguments",
-        "Application Options")
+                    "Application Options")
 group.add_option('-f', '--file', dest='filename',
                  default=False,
                  help='Enter the name of the file to import, you can use wildard as 100-product.product_*.csv')
-group.add_option('','--directory', dest='directory',
+group.add_option('', '--directory', dest='directory',
                  default=False,
                  help='Indicate teh directory to scan file')
 group.add_option('', '--separator', dest='separator',
@@ -151,7 +151,7 @@ def execute_import(filename, connection, separator=',', transaction=False, error
             continue
 
         lines.append(line)
-        logger.debug('line: %s' %str(line))
+        logger.debug('line: %s' % str(line))
     logger.info('Read the file content is finished')
 
     logger.info('Start import the content in OpenERP (%d datas)' % len(lines))
@@ -163,7 +163,7 @@ def execute_import(filename, connection, separator=',', transaction=False, error
     }
     if opts.inactive:
         ctx['active_test'] = False
-    print ctx
+
     if transaction:
         try:
             logger.info('Import %s lines in one transaction' % len(lines))
@@ -204,7 +204,7 @@ if opts.filename:
 
     for filename in list_file:
         if not os.path.exists(filename):
-            logger.error("File %s seem doesn't exists" % i)
+            logger.error("File %s seem doesn't exists" % filename)
             sys.exit(2)
 
         # recherche du mon de l'objet dans le nom du fichier sans l'extension
