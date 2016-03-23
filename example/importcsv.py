@@ -58,10 +58,6 @@ group.add_option('-v', '--verbose', dest='verbose',
 group.add_option('-l', '--log-file', dest='logfile',
                  default=False,
                  help='Enter the name of the log file')
-group.add_option('-e', '--stop-on-error', dest='stop',
-                 action='store_true',
-                 default=False,
-                 help='Stop treatment on error')
 group.add_option('-t', '--transaction', dest='transaction',
                  action='store_true',
                  default=False,
@@ -120,11 +116,7 @@ except Exception, e:
     sys.exit(1)
 
 
-class StopError(Exception):
-    pass
-
-
-def execute_import(filename, connection, separator=',', transaction=False, error_stop=False):
+def execute_import(filename, connection, separator=',', transaction=False):
     """
     Read the file, and launched import_data
     """
@@ -165,32 +157,19 @@ def execute_import(filename, connection, separator=',', transaction=False, error
         ctx['active_test'] = False
 
     if transaction:
-        try:
-            logger.info('Import %s lines in one transaction' % len(lines))
-            res = obj.import_data(header, lines, 'init', '', False, ctx)
-            if res[0] == -1:
-                logger.error('%s' % res[2])
-                logger.error('%s' % str(res[1]))
-            logger.info('End transaction import')
-        except Exception, e:
-            logger.error(str(e))
-            if error_stop:
-                raise StopError(str(e))
+        logger.info('Import %s lines in one transaction' % len(lines))
+        res = obj.import_data(header, lines, 'init', '', False, ctx)
+        if res[0] == -1:
+            raise Exception('{line} {error} '.format(line=res[2], error=res[1]))
+        logger.info('End transaction import')
     else:
         for l in lines:
             count += 1
             logger.debug('Import line %d :' % count)
-            try:
-                res = obj.import_data(header, [l], 'init', '', False, ctx)
-                if res[0] == -1:
-                    logger.error('%s' % repr(l))
-                    logger.error('%s' % repr(ctx))
-                    logger.error('%s' % res[2])
-                    logger.error('%s' % str(res[1]))
-            except Exception, e:
-                logger.error(str(e))
-                if error_stop:
-                    raise StopError(str(e))
+            res = obj.import_data(header, [l], 'init', '', False, ctx)
+            if res[0] == -1:
+                raise Exception('{line} {error} '.format(line=res[2], error=res[1]))
+
     logger.info('Import finished')
 
 if opts.filename:
@@ -220,11 +199,7 @@ elif opts.directory:
     list_file.sort()
     for i in list_file:
         logger.info('Start execute import for %s' % i.split('/').pop())
-        try:
-            execute_import(i, cnx, opts.separator, opts.transaction)
-        except StopError:
-            if opts.stop:
-                sys.exit(1)
+        execute_import(i, cnx, opts.separator, opts.transaction)
 
 else:
     logger.error('no specify --filename or --directory option')
